@@ -14,15 +14,18 @@ const banBtn = document.getElementById("ban-btn");
 const unbanBtn = document.getElementById("unban-btn");
 const actionResult = document.getElementById("action-result");
 
-
+// check for saved token on load
 document.addEventListener("DOMContentLoaded", async () => {
   const token = localStorage.getItem("authToken");
   if (token) {
     showDashboard();
     await loadBans();
+  } else {
+    showLogin();
   }
 });
 
+// LOGIN
 loginBtn.addEventListener("click", async () => {
   const password = passwordInput.value.trim();
   if (!password) return;
@@ -42,25 +45,33 @@ loginBtn.addEventListener("click", async () => {
 
     const data = await res.json();
     localStorage.setItem("authToken", data.token);
+    passwordInput.value = "";
     showDashboard();
     await loadBans();
-
-  } catch {
+  } catch (e) {
     loginError.textContent = "Server error. Try again.";
   }
 });
 
+// LOGOUT
 logoutBtn.addEventListener("click", () => {
   localStorage.removeItem("authToken");
-  dashboard.classList.add("hidden");
-  loginScreen.classList.remove("hidden");
+  showLogin();
 });
 
+// show login screen
+function showLogin() {
+  dashboard.classList.add("hidden");
+  loginScreen.classList.remove("hidden");
+}
+
+// show dashboard
 function showDashboard() {
   loginScreen.classList.add("hidden");
   dashboard.classList.remove("hidden");
 }
 
+// LOAD BANS
 async function loadBans() {
   banList.innerHTML = "Loading bans...";
   try {
@@ -72,14 +83,15 @@ async function loadBans() {
   }
 }
 
+// RENDER BANS
 function renderBans(bans) {
-  if (!bans.length) {
+  if (!Array.isArray(bans) || !bans.length) {
     banList.textContent = "No bans found.";
     return;
   }
 
   banList.innerHTML = "";
-  bans.forEach(ban => {
+  bans.forEach((ban) => {
     const div = document.createElement("div");
     div.className = "ban-entry";
     div.innerHTML = `
@@ -91,14 +103,15 @@ function renderBans(bans) {
   });
 }
 
-
+// SEARCH FILTER
 searchBar.addEventListener("input", () => {
   const term = searchBar.value.toLowerCase();
-  document.querySelectorAll(".ban-entry").forEach(entry => {
+  document.querySelectorAll(".ban-entry").forEach((entry) => {
     entry.style.display = entry.textContent.toLowerCase().includes(term) ? "" : "none";
   });
 });
 
+// BAN USER
 banBtn.addEventListener("click", async () => {
   const userId = userIdInput.value.trim();
   const reason = reasonInput.value.trim();
@@ -123,7 +136,7 @@ banBtn.addEventListener("click", async () => {
   }
 });
 
-
+// UNBAN USER
 unbanBtn.addEventListener("click", async () => {
   const userId = userIdInput.value.trim();
   if (!userId) return (actionResult.textContent = "Enter user ID.");
