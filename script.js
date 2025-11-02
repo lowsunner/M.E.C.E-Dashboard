@@ -64,35 +64,62 @@ function showDashboard() {
   dashboard.classList.remove("hidden");
 }
 
-// LOAD BANS
 async function loadBans() {
   banList.innerHTML = "Loading bans...";
   try {
-    const res = await fetch(`${API_BASE}/bans`);
-    const bans = await res.json();
-    renderBans(bans);
-  } catch {
+    const res = await fetch(`${API_BASE}/bans`, { headers: makeHeaders() });
+    if (!res.ok) {
+      if (res.status === 401) {
+        localStorage.removeItem("authData");
+        authToken = null;
+        adminRole = null;
+        showLogin();
+        return;
+      }
+      banList.textContent = "Failed to load bans.";
+      return;
+    }
+    const data = await res.json();
+
+    // Firebase returns object with keys
+    let list = [];
+    if (data && typeof data === "object") {
+      list = Object.values(data); // convert object -> array
+    }
+
+    renderBans(list);
+  } catch (err) {
+    console.error(err);
     banList.textContent = "Failed to load bans.";
   }
 }
 
-// RENDER BANS
-function renderBans(bans) {
-  if (!bans.length) {
-    banList.textContent = "No bans found.";
+// render bans
+function renderBans(list) {
+  if (!list.length) {
+    banList.innerHTML = "<div class='ban-card'>No bans yet</div>";
     return;
   }
 
   banList.innerHTML = "";
-  bans.forEach(ban => {
-    const div = document.createElement("div");
-    div.className = "ban-entry";
-    div.innerHTML = `
-      <strong>${ban.userId}</strong><br>
-      <span>${ban.reason}</span><br>
-      <small>${new Date(ban.date).toLocaleString()}</small>
-    `;
-    banList.appendChild(div);
+  list.forEach(b => {
+    const card = document.createElement("div");
+    card.className = "ban-card";
+
+    const uid = document.createElement("strong");
+    uid.textContent = b.userId || "(no id)";
+
+    const reason = document.createElement("span");
+    reason.textContent = b.reason || "No reason";
+
+    const date = document.createElement("small");
+    date.textContent = b.date ? new Date(b.date).toLocaleString() : "";
+
+    card.appendChild(uid);
+    card.appendChild(reason);
+    card.appendChild(date);
+
+    banList.appendChild(card);
   });
 }
 
@@ -152,3 +179,4 @@ unbanBtn.addEventListener("click", async () => {
     actionResult.textContent = "Server error.";
   }
 });
+
