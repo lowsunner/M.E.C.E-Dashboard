@@ -1,112 +1,32 @@
-const API_URL = "https://roblox-api-lua8.onrender.com";
-const API_KEY = "super_secret_key_123"; // Replace with your key or prompt for input
+const API_BASE="https://roblox-api-lua8.onrender.com";
+let authToken=null;
 
-// Tabs
-const tabs = document.querySelectorAll(".tab-btn");
-const panels = document.querySelectorAll(".tab-panel");
-tabs.forEach(tab => {
-  tab.addEventListener("click", () => {
-    tabs.forEach(t => t.classList.remove("active"));
-    panels.forEach(p => p.classList.remove("active"));
-    tab.classList.add("active");
-    document.getElementById(tab.dataset.tab).classList.add("active");
-  });
-});
+const pwModal=document.getElementById("pwModal");
+const pwInput=document.getElementById("pwInput");
+const pwSubmit=document.getElementById("pwSubmit");
+const pwMsg=document.getElementById("pwMsg");
+const bansList=document.getElementById("bansList");
+const searchId=document.getElementById("searchId");
+const searchBtn=document.getElementById("searchBtn");
+const refreshBtn=document.getElementById("refreshBtn");
+const banUserId=document.getElementById("banUserId");
+const banReason=document.getElementById("banReason");
+const banBtn=document.getElementById("banBtn");
 
-// Load bans
-async function loadBans() {
-  try {
-    const res = await fetch(`${API_URL}/bans`);
-    const bans = await res.json();
-    const tbody = document.querySelector("#banTable tbody");
-    tbody.innerHTML = "";
-    if (bans.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="3">No banned players</td></tr>`;
-      return;
-    }
-    bans.forEach(b => {
-      const tr = document.createElement("tr");
-      tr.innerHTML = `<td>${b.userId}</td><td>${b.reason}</td><td>${new Date(b.date).toLocaleString()}</td>`;
-      tbody.appendChild(tr);
-    });
-  } catch (err) {
-    console.error(err);
-  }
-}
-loadBans();
-setInterval(loadBans, 10000); // Refresh every 10 sec
+pwSubmit.addEventListener("click",()=>{const v=pwInput.value.trim();if(!v)return pwMsg.textContent="Enter password";login(v)});
+async function login(pw){try{const res=await fetch(`${API_BASE}/login`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({password:pw})});if(!res.ok){const e=await res.json().catch(()=>({error:"Bad"}));pwMsg.textContent=e.error||"Invalid password";return}const d=await res.json();authToken=d.token;pwModal.classList.add("hidden");loadBans()}catch(err){pwMsg.textContent="Network error";console.error(err)}}
 
-// Search player
-document.getElementById("searchBtn").addEventListener("click", async () => {
-  const id = document.getElementById("searchInput").value.trim();
-  const resultDiv = document.getElementById("searchResult");
-  if (!id) return alert("Enter a User ID");
-  try {
-    const res = await fetch(`${API_URL}/bans`);
-    const bans = await res.json();
-    const found = bans.find(b => b.userId.toString() === id);
-    if (found) {
-      resultDiv.innerHTML = `User ${found.userId} is banned: ${found.reason} (${new Date(found.date).toLocaleString()})`;
-    } else {
-      resultDiv.innerHTML = `User ${id} is not banned.`;
-    }
-  } catch (err) {
-    console.error(err);
-    resultDiv.innerHTML = "Error fetching data.";
-  }
-});
+function authHeaders(){return authToken?{"Authorization":`Bearer ${authToken}`}:{}} 
 
-// Ban player
-document.getElementById("banBtn").addEventListener("click", async () => {
-  const id = document.getElementById("banUserId").value.trim();
-  const reason = document.getElementById("banReason").value.trim();
-  const status = document.getElementById("banStatus");
-  if (!id) return alert("Enter User ID to ban");
-  try {
-    const res = await fetch(`${API_URL}/ban`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": API_KEY
-      },
-      body: JSON.stringify({ userId: id, reason })
-    });
-    const data = await res.json();
-    if (data.ok) {
-      status.innerHTML = `✅ User ${id} banned successfully`;
-      loadBans();
-    } else {
-      status.innerHTML = `❌ Error banning user: ${data.error}`;
-    }
-  } catch (err) {
-    console.error(err);
-    status.innerHTML = `❌ Error banning user`;
-  }
-});
+async function loadBans(){try{bansList.innerHTML="Loading...";const res=await fetch(`${API_BASE}/bans`,{headers:authHeaders()});const data=await res.json();bansList.innerHTML="";data.forEach(b=>{const li=document.createElement("li");li.textContent=`${b.userId} - ${b.reason} (${b.date})`;const unban=document.createElement("button");unban.textContent="Unban";unban.onclick=()=>unbanUser(b.userId);li.appendChild(unban);bansList.appendChild(li)})}catch(err){console.error(err);bansList.innerHTML="Failed to load"}}
 
-// Unban player
-document.getElementById("unbanBtn").addEventListener("click", async () => {
-  const id = document.getElementById("unbanUserId").value.trim();
-  const status = document.getElementById("banStatus");
-  if (!id) return alert("Enter User ID to unban");
-  try {
-    const res = await fetch(`${API_URL}/unban`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": API_KEY
-      },
-      body: JSON.stringify({ userId: id })
-    });
-    const data = await res.json();
-    if (data.ok) {
-      status.innerHTML = `✅ User ${id} unbanned successfully`;
-      loadBans();
-    } else {
-      status.innerHTML = `❌ Error unbanning user: ${data.error}`;
-    }
-  } catch (err) {
-    console.error(err);
-    status.innerHTML = `❌ Error unbanning user`;
-  }
-});
+async function searchUser(){const id=searchId.value.trim();if(!id)return;try{const res=await fetch(`${API_BASE}/bans/${id}`,{headers:authHeaders()});if(!res.ok){alert("Not found");return}const d=await res.json();alert(`User ${d.userId} - ${d.reason} (${d.date})`)}catch(err){console.error(err)}} 
+
+async function banUser(){const id=banUserId.value.trim();const reason=banReason.value.trim();if(!id)return;try{const res=await fetch(`${API_BASE}/ban`,{method:"POST",headers:{"Content-Type":"application/json",...authHeaders()},body:JSON.stringify({userId:id,reason:reason})});if(res.ok){loadBans();banUserId.value="";banReason.value="";}else{const e=await res.json();alert(e.error||"Error")}}catch(err){console.error(err)}} 
+
+async function unbanUser(id){try{const res=await fetch(`${API_BASE}/unban`,{method:"POST",headers:{"Content-Type":"application/json",...authHeaders()},body:JSON.stringify({userId:id})});if(res.ok)loadBans();else{const e=await res.json();alert(e.error||"Error")}}catch(err){console.error(err)}}
+
+searchBtn.addEventListener("click",searchUser);
+refreshBtn.addEventListener("click",loadBans);
+banBtn.addEventListener("click",banUser);
+window.addEventListener("load",loadBans);
