@@ -1,11 +1,14 @@
+// API base
 const API_BASE = "https://roblox-api-lua8.onrender.com";
 
+// elements
 const loginScreen = document.getElementById("login-screen");
 const dashboard = document.getElementById("dashboard");
 const passwordInput = document.getElementById("password-input");
 const loginBtn = document.getElementById("login-btn");
 const loginError = document.getElementById("login-error");
 const logoutBtn = document.getElementById("logout-btn");
+const refreshBtn = document.getElementById("refresh-btn");
 const banList = document.getElementById("ban-list");
 const searchBar = document.getElementById("search-bar");
 const userIdInput = document.getElementById("user-id");
@@ -13,105 +16,163 @@ const reasonInput = document.getElementById("reason");
 const banBtn = document.getElementById("ban-btn");
 const unbanBtn = document.getElementById("unban-btn");
 const actionResult = document.getElementById("action-result");
+const adminLevelEl = document.getElementById("admin-level");
 
-// check for saved token on load
+// token + role
+let authToken = null;
+let adminRole = null;
+
+// helper: headers with auth when available
+function makeHeaders() {
+  const h = { "Content-Type": "application/json" };
+  if (authToken) h["Authorization"] = `Bearer ${authToken}`;
+  return h;
+}
+
+// restore session on load
 document.addEventListener("DOMContentLoaded", async () => {
-  const token = localStorage.getItem("authToken");
-  if (token) {
-    showDashboard();
-    await loadBans();
+  const saved = localStorage.getItem("authData");
+  if (saved) {
+    try {
+      const parsed = JSON.parse(saved);
+      authToken = parsed.token;
+      adminRole = parsed.role || null;
+      showDashboard();
+      await loadBans();
+      updateAdminInfo();
+    } catch {
+      localStorage.removeItem("authData");
+      showLogin();
+    }
   } else {
     showLogin();
   }
 });
 
-// LOGIN
+// show/hide helpers
+function showLogin() {
+  dashboard.classList.add("hidden");
+  loginScreen.classList.remove("hidden");
+  loginError.textContent = "";
+}
+
+function showDashboard() {
+  loginScreen.classList.add("hidden");
+  dashboard.classList.remove("hidden");
+  loginError.textContent = "";
+}
+
+// update admin level display
+function updateAdminInfo() {
+  adminLevelEl.textContent = adminRole ? `Role: ${adminRole}` : "";
+}
+
+// login
 loginBtn.addEventListener("click", async () => {
-  const password = passwordInput.value.trim();
-  if (!password) return;
+  const pw = passwordInput.value.trim();
+  if (!pw) return (loginError.textContent = "Enter password.");
 
   loginError.textContent = "Verifying...";
   try {
     const res = await fetch(`${API_BASE}/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ password }),
+      body: JSON.stringify({ password: pw })
     });
 
     if (!res.ok) {
-      loginError.textContent = "Invalid password.";
+      const err = await res.json().catch(() => ({ error: "Login failed" }));
+      loginError.textContent = err.error || "Invalid password.";
       return;
     }
 
     const data = await res.json();
-    localStorage.setItem("authToken", data.token);
+    authToken = data.token;
+    adminRole = data.role || null;
+    localStorage.setItem("authData", JSON.stringify({ token: authToken, role: adminRole }));
     passwordInput.value = "";
+    loginError.textContent = "";
     showDashboard();
+    updateAdminInfo();
     await loadBans();
-  } catch (e) {
-    loginError.textContent = "Server error. Try again.";
+  } catch (err) {
+    console.error(err);
+    loginError.textContent = "Server error.";
   }
 });
 
-// LOGOUT
+// logout
 logoutBtn.addEventListener("click", () => {
-  localStorage.removeItem("authToken");
+  authToken = null;
+  adminRole = null;
+  localStorage.removeItem("authData");
   showLogin();
 });
 
-// show login screen
-function showLogin() {
-  dashboard.classList.add("hidden");
-  loginScreen.classList.remove("hidden");
-}
+// refresh
+refreshBtn.addEventListener("click", () => loadBans());
 
-// show dashboard
-function showDashboard() {
-  loginScreen.classList.add("hidden");
-  dashboard.classList.remove("hidden");
-}
-
-// LOAD BANS
+// load bans
 async function loadBans() {
   banList.innerHTML = "Loading bans...";
   try {
-    const res = await fetch(`${API_BASE}/bans`);
-    const bans = await res.json();
-    renderBans(bans);
-  } catch {
+    const res = await fetch(`${API_BASE}/bans`, { headers: makeHeaders() });
+    if (!res.ok) {
+      if (res.status === 401) {
+        // token expired or invalid — force logout
+        localStorage.removeItem("authData");
+        authToken = null;
+        adminRole = null;
+        showLogin();
+        return;
+      }
+      banList.textContent = "Failed to load bans.";
+      return;
+    }
+    const data = await res.json();
+    renderBans(data);
+  } catch (err) {
+    console.error(err);
     banList.textContent = "Failed to load bans.";
   }
 }
 
-// RENDER BANS
-function renderBans(bans) {
-  if (!Array.isArray(bans) || !bans.length) {
-    banList.textContent = "No bans found.";
+// render bans (accept array or object)
+function renderBans(data) {
+  let list = [];
+  if (!data) list = [];
+  else if (Array.isArray(data)) list = data;
+  else if (typeof data === "object") list = Object.values(data);
+  if (!list.length) {
+    banList.innerHTML = "<div class='ban-card'>No bans yet</div>";
     return;
   }
-
   banList.innerHTML = "";
-  bans.forEach((ban) => {
-    const div = document.createElement("div");
-    div.className = "ban-entry";
-    div.innerHTML = `
-      <strong>${ban.userId}</strong><br>
-      <span>${ban.reason}</span><br>
-      <small>${new Date(ban.date).toLocaleString()}</small>
-    `;
-    banList.appendChild(div);
+  list.forEach(b => {
+    const card = document.createElement("div");
+    card.className = "ban-card";
+    const uid = document.createElement("strong");
+    uid.textContent = b.userId || "(no id)";
+    const reason = document.createElement("span");
+    reason.textContent = b.reason || "No reason";
+    const date = document.createElement("small");
+    date.textContent = b.date ? new Date(b.date).toLocaleString() : "";
+    card.appendChild(uid);
+    card.appendChild(reason);
+    card.appendChild(date);
+    banList.appendChild(card);
   });
 }
 
-// SEARCH FILTER
+// search filter
 searchBar.addEventListener("input", () => {
   const term = searchBar.value.toLowerCase();
-  document.querySelectorAll(".ban-entry").forEach((entry) => {
-    entry.style.display = entry.textContent.toLowerCase().includes(term) ? "" : "none";
+  document.querySelectorAll(".ban-card").forEach(card => {
+    card.style.display = card.textContent.toLowerCase().includes(term) ? "" : "none";
   });
 });
 
-// BAN USER
+// ban user
 banBtn.addEventListener("click", async () => {
   const userId = userIdInput.value.trim();
   const reason = reasonInput.value.trim();
@@ -121,22 +182,25 @@ banBtn.addEventListener("click", async () => {
   try {
     const res = await fetch(`${API_BASE}/ban`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ userId, reason }),
+      headers: makeHeaders(),
+      body: JSON.stringify({ userId, reason })
     });
-
-    if (res.ok) {
-      actionResult.textContent = `✅ User ${userId} banned.`;
-      await loadBans();
-    } else {
-      actionResult.textContent = "Failed to ban user.";
+    if (!res.ok) {
+      const err = await res.json().catch(()=>({error:"Failed"}));
+      actionResult.textContent = err.error || "Failed to ban user.";
+      return;
     }
-  } catch {
+    actionResult.textContent = `✅ User ${userId} banned.`;
+    userIdInput.value = "";
+    reasonInput.value = "";
+    await loadBans();
+  } catch (err) {
+    console.error(err);
     actionResult.textContent = "Server error.";
   }
 });
 
-// UNBAN USER
+// unban user
 unbanBtn.addEventListener("click", async () => {
   const userId = userIdInput.value.trim();
   if (!userId) return (actionResult.textContent = "Enter user ID.");
@@ -145,17 +209,19 @@ unbanBtn.addEventListener("click", async () => {
   try {
     const res = await fetch(`${API_BASE}/unban`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ userId }),
+      headers: makeHeaders(),
+      body: JSON.stringify({ userId })
     });
-
-    if (res.ok) {
-      actionResult.textContent = `✅ User ${userId} unbanned.`;
-      await loadBans();
-    } else {
-      actionResult.textContent = "Failed to unban user.";
+    if (!res.ok) {
+      const err = await res.json().catch(()=>({error:"Failed"}));
+      actionResult.textContent = err.error || "Failed to unban user.";
+      return;
     }
-  } catch {
+    actionResult.textContent = `✅ User ${userId} unbanned.`;
+    userIdInput.value = "";
+    await loadBans();
+  } catch (err) {
+    console.error(err);
     actionResult.textContent = "Server error.";
   }
 });
