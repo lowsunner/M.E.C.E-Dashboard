@@ -1,31 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>M.E.C.E ADMIN DASHBOARD</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>M.E.C.E Dashboard</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div class="overlay"></div>
 
   <div id="login-screen" class="card">
     <h1>M.E.C.E ADMIN PANEL</h1>
-    <input type="password" id="password-input" placeholder="Enter access key" autocomplete="off">
+    <input type="password" id="password-input" placeholder="Enter access key">
     <button id="login-btn">Access</button>
     <p id="login-error"></p>
   </div>
 
   <div id="dashboard" class="hidden">
-    <header class="dashboard-header">
-      <div>
-        <h1>M.E.C.E CONTROL CENTER</h1>
-        <p id="admin-level"></p>
-      </div>
-      <div class="header-right">
-        <button id="refresh-btn" class="small">Refresh</button>
-        <button id="logout-btn" class="small danger">Logout</button>
-      </div>
+    <header>
+      <h1>M.E.C.E CONTROL CENTER</h1>
+      <p id="admin-level"></p>
+      <button id="logout-btn">Logout</button>
     </header>
 
     <div class="controls">
@@ -39,7 +34,7 @@
       <p id="action-result"></p>
     </div>
 
-    <section id="ban-list" class="ban-list"></section>
+    <section id="ban-list"></section>
   </div>
 
   <script src="script.js"></script>
