@@ -3,34 +3,43 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin Panel</title>
+<title>Admin Dashboard</title>
 <link rel="stylesheet" href="style.css">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 </head>
 <body>
-<div id="pwModal" class="modal">
+<div id="loginModal" class="modal">
   <div class="modal-content">
-    <h3>Admin Login</h3>
+    <h2>Admin Login</h2>
     <input id="pwInput" type="password" placeholder="Enter password">
-    <button id="pwSubmit">Unlock</button>
-    <div id="pwMsg"></div>
+    <button id="loginBtn">Login</button>
+    <div id="loginMsg"></div>
   </div>
 </div>
-<header>
-  <h1>Admin Panel</h1>
+
+<header class="navbar">
+  <h1 class="logo">MyBrand Admin</h1>
 </header>
-<main>
-  <section>
-    <input id="searchId" placeholder="Search by user ID">
-    <button id="searchBtn">Search</button>
-    <button id="refreshBtn">Refresh List</button>
+
+<main class="container">
+  <section class="bans-section">
+    <h2>Banned Players</h2>
+    <div class="search-bar">
+      <input id="searchId" placeholder="Search by User ID">
+      <button id="searchBtn">Search</button>
+      <button id="refreshBtn">Refresh</button>
+    </div>
     <ul id="bansList"></ul>
   </section>
-  <section>
-    <input id="banUserId" placeholder="User ID to ban">
+
+  <section class="ban-section">
+    <h2>Ban Player</h2>
+    <input id="banUserId" placeholder="User ID">
     <input id="banReason" placeholder="Reason">
     <button id="banBtn">Ban User</button>
   </section>
 </main>
+
 <script src="script.js"></script>
 </body>
 </html>
