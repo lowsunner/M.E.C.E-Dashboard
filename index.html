@@ -1,45 +1,66 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin Dashboard</title>
-<link rel="stylesheet" href="style.css">
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>M.E.C.E ADMIN DASHBOARD🤑🤑</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 </head>
 <body>
-<div id="loginModal" class="modal">
-  <div class="modal-content">
-    <h2>Admin Login</h2>
-    <input id="pwInput" type="password" placeholder="Enter password">
-    <button id="loginBtn">Login</button>
-    <div id="loginMsg"></div>
-  </div>
-</div>
+  <header class="navbar">
+    <h1 class="logo">M.E.C.E ADMIN DASHBOARD🤑🤑</h1>
+    <nav>
+      <button class="tab-btn active" data-tab="bans">Banned Players</button>
+      <button class="tab-btn" data-tab="search">Search Player</button>
+      <button class="tab-btn" data-tab="ban">Ban/Unban Player</button>
+    </nav>
+  </header>
 
-<header class="navbar">
-  <h1 class="logo">MyBrand Admin</h1>
-</header>
+  <main>
+    <!-- Banned players list -->
+    <section id="bans" class="tab-panel active">
+      <h2>Banned Players</h2>
+      <table id="banTable">
+        <thead>
+          <tr>
+            <th>User ID</th>
+            <th>Reason</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td colspan="3">Loading...</td></tr>
+        </tbody>
+      </table>
+    </section>
 
-<main class="container">
-  <section class="bans-section">
-    <h2>Banned Players</h2>
-    <div class="search-bar">
-      <input id="searchId" placeholder="Search by User ID">
+    <!-- Search player -->
+    <section id="search" class="tab-panel">
+      <h2>Search Player</h2>
+      <input type="text" id="searchInput" placeholder="Enter User ID..." />
       <button id="searchBtn">Search</button>
-      <button id="refreshBtn">Refresh</button>
-    </div>
-    <ul id="bansList"></ul>
-  </section>
+      <div id="searchResult"></div>
+    </section>
 
-  <section class="ban-section">
-    <h2>Ban Player</h2>
-    <input id="banUserId" placeholder="User ID">
-    <input id="banReason" placeholder="Reason">
-    <button id="banBtn">Ban User</button>
-  </section>
-</main>
+    <!-- Ban/unban -->
+    <section id="ban" class="tab-panel">
+      <h2>Ban / Unban Player</h2>
+      <div class="form-group">
+        <input type="text" id="banUserId" placeholder="User ID" />
+        <input type="text" id="banReason" placeholder="Reason (optional)" />
+        <button id="banBtn">Ban</button>
+      </div>
+      <div class="form-group">
+        <input type="text" id="unbanUserId" placeholder="User ID" />
+        <button id="unbanBtn">Unban</button>
+      </div>
+      <div id="banStatus"></div>
+    </section>
+  </main>
 
-<script src="script.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
