@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>M.E.C.E ADMIN PANEL</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>M.E.C.E Admin Dashboard</title>
+  <link rel="stylesheet" href="style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 </head>
 <body>
   <div class="overlay"></div>
 
-  <div id="login-screen" class="card fade-in">
+  <div id="login-screen" class="card">
     <h1>M.E.C.E ADMIN PANEL</h1>
-    <input type="password" id="password-input" placeholder="Enter access key">
+    <input type="password" id="password-input" placeholder="Enter access key" />
     <button id="login-btn">Access</button>
     <p id="login-error"></p>
   </div>
@@ -20,22 +20,53 @@
   <div id="dashboard" class="hidden">
     <header>
       <h1>M.E.C.E CONTROL CENTER</h1>
-      <p id="admin-level"></p>
       <button id="logout-btn">Logout</button>
     </header>
 
-    <div class="controls">
-      <input type="text" id="search-bar" placeholder="Search by User ID...">
-      <div class="ban-controls">
-        <input type="text" id="user-id" placeholder="User ID">
-        <input type="text" id="reason" placeholder="Reason">
-        <button id="ban-btn" class="danger">Ban</button>
-        <button id="unban-btn" class="success">Unban</button>
-      </div>
-      <p id="action-result"></p>
-    </div>
+    <nav class="tabs">
+      <button class="tab-btn active" data-tab="bans-tab">Banned Players</button>
+      <button class="tab-btn" data-tab="search-tab">Search Player</button>
+      <button class="tab-btn" data-tab="ban-tab">Ban/Unban Player</button>
+    </nav>
 
-    <section id="ban-list"></section>
+    <main>
+      <section id="bans-tab" class="tab-panel active">
+        <h2>Banned Players</h2>
+        <table id="banTable">
+          <thead>
+            <tr>
+              <th>User ID</th>
+              <th>Reason</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td colspan="3">Loading...</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section id="search-tab" class="tab-panel">
+        <h2>Search Player</h2>
+        <input type="text" id="searchInput" placeholder="Enter User ID..." />
+        <button id="searchBtn">Search</button>
+        <div id="searchResult"></div>
+      </section>
+
+      <section id="ban-tab" class="tab-panel">
+        <h2>Ban / Unban Player</h2>
+        <div class="form-group">
+          <input type="text" id="banUserId" placeholder="User ID" />
+          <input type="text" id="banReason" placeholder="Reason (optional)" />
+          <button id="banBtn">Ban</button>
+        </div>
+        <div class="form-group">
+          <input type="text" id="unbanUserId" placeholder="User ID" />
+          <button id="unbanBtn">Unban</button>
+        </div>
+        <div id="banStatus"></div>
+      </section>
+    </main>
   </div>
 
   <script src="script.js"></script>
