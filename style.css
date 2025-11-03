@@ -8,35 +8,49 @@ body {
 .overlay {
   position: fixed;
   top:0; left:0; right:0; bottom:0;
-  background: rgba(0,0,0,0.6);
-  opacity: 0;
-  transition: opacity 0.5s ease;
-  z-index: 1;
+  background: rgba(0,0,0,0.5);
+  display: none;
 }
 
-.overlay.show {
-  opacity: 1;
-}
-
-.hidden { display: none; }
-
-#login-screen {
+.card {
   position: fixed;
-  top: 50%; left: 50%;
-  transform: translate(-50%, -50%) translateY(-20px);
-  padding: 2rem;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   background: #1f1f1f;
-  border-radius: 10px;
-  width: 300px;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.7);
   text-align: center;
   opacity: 0;
-  transition: opacity 0.5s ease, transform 0.5s ease;
-  z-index: 2;
+  transition: opacity 0.5s ease;
 }
 
-#login-screen.show {
-  opacity: 1;
-  transform: translate(-50%, -50%) translateY(0);
+.card.visible { opacity: 1; }
+
+input {
+  display: block;
+  margin: 1rem auto;
+  padding: 0.5rem;
+  width: 80%;
+  border-radius: 6px;
+  border: 1px solid #333;
+  background: #1f1f1f;
+  color: #e0e0e0;
+}
+
+button {
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  background: #1a73e8;
+  color: #fff;
+  transition: 0.3s;
+}
+
+button:hover {
+  background: #155cb0;
 }
 
 header {
@@ -48,21 +62,22 @@ header {
   border-bottom: 1px solid #333;
 }
 
-.tabs {
+nav.tabs {
   display: flex;
-  justify-content: start;
+  justify-content: center;
   background: #1f1f1f;
-  padding: 0.5rem 2rem;
+  border-bottom: 1px solid #333;
 }
 
 .tab-btn {
-  margin-right: 1rem;
+  margin: 0.5rem;
   padding: 0.5rem 1rem;
   background: none;
   border: 1px solid #444;
   color: #e0e0e0;
-  cursor: pointer;
   border-radius: 6px;
+  cursor: pointer;
+  transition: 0.3s;
 }
 
 .tab-btn.active {
@@ -70,20 +85,16 @@ header {
   border-color: #1a73e8;
 }
 
+.tab-btn:hover:not(.active) {
+  background: #333;
+}
+
 main {
   padding: 2rem;
 }
 
-.tab-panel {
-  display: none;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.tab-panel.active {
-  display: block;
-  opacity: 1;
-}
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
 
 table {
   width: 100%;
@@ -97,29 +108,17 @@ th, td {
   border-bottom: 1px solid #333;
 }
 
-th { background: #1a73e8; color: #fff; }
+th {
+  background: #1a73e8;
+  color: #fff;
+}
 
 tr:hover { background: #1f1f1f; }
 
-input {
-  padding: 0.5rem;
-  border-radius: 6px;
-  border: 1px solid #333;
-  background: #1f1f1f;
-  color: #e0e0e0;
-  margin-right: 0.5rem;
-}
-
-button {
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
-  border: none;
-  cursor: pointer;
-  background: #1a73e8;
-  color: #fff;
-  transition: background 0.3s;
-}
-
-button:hover { background: #155cb0; }
+.ban-btn { background: #e53935; }
+.ban-btn:hover { background: #b71c1c; }
+.unban-btn { background: #43a047; }
+.unban-btn:hover { background: #1b5e20; }
 
 #banStatus, #searchResult { margin-top: 1rem; }
+.hidden { display: none; }
