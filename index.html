@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>M.E.C.E Admin Dashboard</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 </head>
 <body>
-  <div class="overlay"></div>
+  <div class="overlay hidden"></div>
 
   <div id="login-screen" class="card hidden">
     <h1>M.E.C.E ADMIN PANEL</h1>
-    <input type="password" id="password-input" placeholder="Enter access key">
+    <input type="password" id="password-input" placeholder="Enter access key" />
     <button id="login-btn">Access</button>
     <p id="login-error"></p>
   </div>
@@ -48,7 +48,7 @@
 
       <section id="search-tab" class="tab-panel">
         <h2>Search Player</h2>
-        <input type="text" id="searchInput" placeholder="Enter User ID...">
+        <input type="text" id="searchInput" placeholder="Enter User ID..." />
         <button id="searchBtn">Search</button>
         <div id="searchResult"></div>
       </section>
@@ -56,13 +56,13 @@
       <section id="ban-tab" class="tab-panel">
         <h2>Ban / Unban Player</h2>
         <div class="form-group">
-          <input type="text" id="banUserId" placeholder="User ID">
-          <input type="text" id="banReason" placeholder="Reason (optional)">
-          <button id="banBtn" class="ban-btn">Ban</button>
+          <input type="text" id="banUserId" placeholder="User ID" />
+          <input type="text" id="banReason" placeholder="Reason (optional)" />
+          <button id="banBtn">Ban</button>
         </div>
         <div class="form-group">
-          <input type="text" id="unbanUserId" placeholder="User ID">
-          <button id="unbanBtn" class="unban-btn">Unban</button>
+          <input type="text" id="unbanUserId" placeholder="User ID" />
+          <button id="unbanBtn">Unban</button>
         </div>
         <div id="banStatus"></div>
       </section>
