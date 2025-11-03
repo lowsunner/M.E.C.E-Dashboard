@@ -56,13 +56,14 @@
         <div id="searchResult"></div>
       </section>
 
+<!-- Ban/Unban Section -->
 <section id="ban-tab" class="tab-panel">
   <h2>Ban / Unban Player</h2>
   <div class="form-group">
     <input type="text" id="banUserId" placeholder="User ID" />
     <input type="text" id="banReason" placeholder="Reason (optional)" />
     
-    <!-- New Inputs for Ban Duration -->
+    <!-- Ban Duration Inputs -->
     <input type="number" id="banYears" placeholder="Years" min="0" />
     <input type="number" id="banMonths" placeholder="Months" min="0" />
     <input type="number" id="banDays" placeholder="Days" min="0" />
@@ -70,8 +71,15 @@
     
     <button id="banBtn">Ban</button>
   </div>
+
+  <!-- Unban Section -->
+  <div class="form-group">
+    <input type="text" id="unbanUserId" placeholder="User ID" />
+    <button id="unbanBtn">Unban</button>
+  </div>
   <div id="banStatus"></div>
 </section>
+
 
 
     </main>
