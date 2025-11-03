@@ -2,9 +2,10 @@ const API_BASE = 'https://roblox-api-lua8.onrender.com';
 
 document.addEventListener('DOMContentLoaded', () => {
   const loginScreen = document.getElementById('login-screen');
+  const overlay = document.querySelector('.overlay');
   const dashboard = document.getElementById('dashboard');
-  const passwordInput = document.getElementById('password-input');
   const loginBtn = document.getElementById('login-btn');
+  const passwordInput = document.getElementById('password-input');
   const loginError = document.getElementById('login-error');
   const logoutBtn = document.getElementById('logout-btn');
 
@@ -16,22 +17,15 @@ document.addEventListener('DOMContentLoaded', () => {
   const searchBtn = document.getElementById('searchBtn');
   const searchResult = document.getElementById('searchResult');
 
-  const banUserId = document.getElementById('banUserId');
-  const banReason = document.getElementById('banReason');
+  const banUserIdInput = document.getElementById('banUserId');
+  const banReasonInput = document.getElementById('banReason');
   const banBtn = document.getElementById('banBtn');
-  const unbanUserId = document.getElementById('unbanUserId');
+  const unbanUserIdInput = document.getElementById('unbanUserId');
   const unbanBtn = document.getElementById('unbanBtn');
   const banStatus = document.getElementById('banStatus');
 
-  function showDashboard() {
-    loginScreen.classList.add('hidden');
-    dashboard.classList.remove('hidden');
-    loadBans();
-  }
-
-  async function login() {
-    const password = passwordInput.value;
-    loginError.textContent = '';
+  // --- Login ---
+  async function login(password) {
     try {
       const res = await fetch(`${API_BASE}/login`, {
         method: 'POST',
@@ -39,60 +33,81 @@ document.addEventListener('DOMContentLoaded', () => {
         body: JSON.stringify({ password })
       });
       if (!res.ok) throw new Error('Unauthorized');
-      localStorage.setItem('accessToken', password);
-      showDashboard();
-    } catch {
+      localStorage.setItem('adminPassword', password);
+
+      // Hide login, show dashboard
+      loginScreen.classList.add('hidden');
+      overlay.style.opacity = 0;
+      setTimeout(() => overlay.classList.add('hidden'), 500);
+      dashboard.classList.remove('hidden');
+
+      loadBans();
+    } catch (err) {
       loginError.textContent = 'Invalid password';
     }
   }
 
-  function logout() {
-    localStorage.removeItem('accessToken');
+  loginBtn.addEventListener('click', () => login(passwordInput.value));
+
+  // Auto-login if localStorage has password
+  const storedPassword = localStorage.getItem('adminPassword');
+  if (storedPassword) login(storedPassword);
+
+  logoutBtn.addEventListener('click', () => {
+    localStorage.removeItem('adminPassword');
     dashboard.classList.add('hidden');
     loginScreen.classList.remove('hidden');
-    passwordInput.value = '';
-  }
+    overlay.classList.remove('hidden');
+    overlay.style.opacity = 1;
+  });
 
-  function switchTab(tabId) {
-    tabButtons.forEach(btn => btn.classList.remove('active'));
-    tabPanels.forEach(panel => panel.classList.remove('active'));
-    const btn = Array.from(tabButtons).find(b => b.dataset.tab === tabId);
-    if (btn) btn.classList.add('active');
-    const panel = document.getElementById(tabId);
-    if (panel) panel.classList.add('active');
-  }
+  // --- Tabs ---
+  tabButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      tabButtons.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const target = btn.dataset.tab;
+      tabPanels.forEach(panel => panel.id === target ? panel.classList.add('active') : panel.classList.remove('active'));
+    });
+  });
 
+  // --- Load Bans ---
   async function loadBans() {
-    banTableBody.innerHTML = '<tr><td colspan="3">Loading...</td></tr>';
     try {
       const res = await fetch(`${API_BASE}/bans`);
-      const data = await res.json();
-      if (!Array.isArray(data)) return banTableBody.innerHTML = '<tr><td colspan="3">No bans</td></tr>';
-      banTableBody.innerHTML = data.map(b => `<tr><td>${b.userId}</td><td>${b.reason}</td><td>${b.date}</td></tr>`).join('');
-    } catch {
+      if (!res.ok) throw new Error('Failed to fetch bans');
+      const bans = await res.json();
+      if (!Array.isArray(bans)) {
+        banTableBody.innerHTML = '<tr><td colspan="3">No bans</td></tr>';
+        return;
+      }
+      banTableBody.innerHTML = bans.map(b => `<tr><td>${b.userId}</td><td>${b.reason}</td><td>${b.date}</td></tr>`).join('');
+    } catch (err) {
       banTableBody.innerHTML = '<tr><td colspan="3">Failed to load bans</td></tr>';
     }
   }
 
-  async function searchPlayer() {
-    const userId = searchInput.value.trim();
-    searchResult.textContent = '';
-    if (!userId) return;
+  // --- Search ---
+  searchBtn.addEventListener('click', async () => {
+    const id = searchInput.value.trim();
+    if (!id) return;
+    searchResult.textContent = 'Loading...';
     try {
-      const res = await fetch(`${API_BASE}/bans/${userId}`);
-      if (!res.ok) throw new Error('Not found');
+      const res = await fetch(`${API_BASE}/bans/${id}`);
+      if (!res.ok) throw new Error('User not found');
       const data = await res.json();
-      searchResult.innerHTML = `<p>User: ${data.userId}<br>Reason: ${data.reason}<br>Date: ${data.date}</p>`;
-    } catch {
+      searchResult.textContent = `User ID: ${data.userId}, Reason: ${data.reason}, Date: ${data.date}`;
+    } catch (err) {
       searchResult.textContent = 'User not found';
     }
-  }
+  });
 
-  async function banUser() {
-    const userId = banUserId.value.trim();
-    const reason = banReason.value.trim();
-    banStatus.textContent = '';
+  // --- Ban / Unban ---
+  banBtn.addEventListener('click', async () => {
+    const userId = banUserIdInput.value.trim();
     if (!userId) return;
+    const reason = banReasonInput.value.trim() || 'No reason';
+    banStatus.textContent = 'Processing...';
     try {
       const res = await fetch(`${API_BASE}/ban`, {
         method: 'POST',
@@ -100,17 +115,17 @@ document.addEventListener('DOMContentLoaded', () => {
         body: JSON.stringify({ userId, reason })
       });
       if (!res.ok) throw new Error('Failed');
-      banStatus.textContent = `Banned ${userId}`;
+      banStatus.textContent = 'User banned!';
       loadBans();
-    } catch {
+    } catch (err) {
       banStatus.textContent = 'Failed to ban user';
     }
-  }
+  });
 
-  async function unbanUser() {
-    const userId = unbanUserId.value.trim();
-    banStatus.textContent = '';
+  unbanBtn.addEventListener('click', async () => {
+    const userId = unbanUserIdInput.value.trim();
     if (!userId) return;
+    banStatus.textContent = 'Processing...';
     try {
       const res = await fetch(`${API_BASE}/unban`, {
         method: 'POST',
@@ -118,28 +133,11 @@ document.addEventListener('DOMContentLoaded', () => {
         body: JSON.stringify({ userId })
       });
       if (!res.ok) throw new Error('Failed');
-      banStatus.textContent = `Unbanned ${userId}`;
+      banStatus.textContent = 'User unbanned!';
       loadBans();
-    } catch {
+    } catch (err) {
       banStatus.textContent = 'Failed to unban user';
     }
-  }
-
-  // Event listeners
-  if (loginBtn) loginBtn.addEventListener('click', login);
-  if (logoutBtn) logoutBtn.addEventListener('click', logout);
-  if (searchBtn) searchBtn.addEventListener('click', searchPlayer);
-  if (banBtn) banBtn.addEventListener('click', banUser);
-  if (unbanBtn) unbanBtn.addEventListener('click', unbanUser);
-
-  tabButtons.forEach(btn => {
-    btn.addEventListener('click', () => switchTab(btn.dataset.tab));
   });
 
-  // Auto-login if token exists
-  const token = localStorage.getItem('accessToken');
-  if (token) {
-    passwordInput.value = token;
-    login();
-  }
 });
