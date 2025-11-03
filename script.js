@@ -24,6 +24,7 @@ const banStatus = document.getElementById('banStatus');
 function showDashboard() {
   loginScreen.classList.add('hidden');
   dashboard.classList.remove('hidden');
+  document.getElementById('dashboard').classList.remove('hidden');
   loadBans();
 }
 
@@ -53,6 +54,7 @@ loginBtn.addEventListener('click', async () => {
     });
     if (!res.ok) throw new Error('Unauthorized');
     localStorage.setItem('adminPassword', password);
+    
     showDashboard();
   } catch {
     loginError.textContent = 'Invalid password';
@@ -140,5 +142,6 @@ document.addEventListener('DOMContentLoaded', () => {
   if (saved) {
     passwordInput.value = saved;
     loginBtn.click();
+    
   }
 });
