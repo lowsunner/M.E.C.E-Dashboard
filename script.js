@@ -23,7 +23,6 @@ const unbanUserId = document.getElementById('unbanUserId');
 const unbanBtn = document.getElementById('unbanBtn');
 const banStatus = document.getElementById('banStatus');
 
-// Helper functions
 function showLogin() {
   loginScreen.classList.add('show');
   dashboard.classList.remove('show');
@@ -35,69 +34,66 @@ function showDashboard() {
   loadBans();
 }
 
-// LOGIN
+function isLoggedIn() {
+  return !!localStorage.getItem('adminToken');
+}
+
 async function login() {
   const password = passwordInput.value.trim();
   if (!password) return;
-
   try {
     const res = await fetch(`${API_BASE}/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ password })
     });
-
     if (!res.ok) throw new Error('Invalid password');
-
-    localStorage.setItem('adminPassword', password);
+    const data = await res.json();
+    localStorage.setItem('adminToken', data.token);
     showDashboard();
-  } catch (err) {
+  } catch {
     loginError.textContent = 'Access Denied';
   }
 }
 
 loginBtn.addEventListener('click', login);
 
-// LOGOUT
 logoutBtn.addEventListener('click', () => {
-  localStorage.removeItem('adminPassword');
+  localStorage.removeItem('adminToken');
   showLogin();
 });
 
-// AUTO LOGIN
 window.addEventListener('DOMContentLoaded', () => {
-  if (localStorage.getItem('adminPassword')) {
+  if (isLoggedIn()) {
     showDashboard();
   } else {
     showLogin();
   }
 });
 
-// TAB SWITCHING
 tabs.forEach(btn => {
   btn.addEventListener('click', () => {
     tabs.forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
-
     tabPanels.forEach(panel => panel.classList.remove('active'));
     document.getElementById(btn.dataset.tab).classList.add('active');
   });
 });
 
-// LOAD BANS
 async function loadBans() {
+  if (!isLoggedIn()) return;
   banTableBody.innerHTML = '<tr><td colspan="3">Loading...</td></tr>';
   try {
-    const res = await fetch(`${API_BASE}/bans`);
-    if (!res.ok) throw new Error('Failed to fetch');
+    const res = await fetch(`${API_BASE}/bans`, {
+      headers: { 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` }
+    });
+    if (!res.ok) throw new Error();
     const data = await res.json();
     const bans = Object.values(data);
-
     if (!bans.length) {
       banTableBody.innerHTML = '<tr><td colspan="3">No bans</td></tr>';
       return;
     }
-
     banTableBody.innerHTML = bans.map(b => 
       `<tr>
         <td>${b.userId}</td>
@@ -109,15 +105,16 @@ async function loadBans() {
   }
 }
 
-// SEARCH
 searchBtn.addEventListener('click', async () => {
+  if (!isLoggedIn()) return;
   const userId = searchInput.value.trim();
   if (!userId) return;
-
   searchResult.textContent = 'Searching...';
   try {
-    const res = await fetch(`${API_BASE}/bans/${userId}`);
-    if (!res.ok) throw new Error('Not found');
+    const res = await fetch(`${API_BASE}/bans/${userId}`, {
+      headers: { 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` }
+    });
+    if (!res.ok) throw new Error();
     const ban = await res.json();
     searchResult.textContent = `User ${ban.userId} banned for: "${ban.reason}" on ${new Date(ban.date).toLocaleString()}`;
   } catch {
@@ -125,20 +122,22 @@ searchBtn.addEventListener('click', async () => {
   }
 });
 
-// BAN
 banBtn.addEventListener('click', async () => {
+  if (!isLoggedIn()) return;
   const userId = banUserId.value.trim();
   const reason = banReason.value.trim();
   if (!userId) return;
-
   banStatus.textContent = 'Banning...';
   try {
     const res = await fetch(`${API_BASE}/ban`, {
       method: 'POST',
-      headers: {'Content-Type':'application/json'},
+      headers: {
+        'Content-Type':'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+      },
       body: JSON.stringify({ userId, reason })
     });
-    if (!res.ok) throw new Error('Failed');
+    if (!res.ok) throw new Error();
     banStatus.textContent = 'User banned!';
     loadBans();
   } catch {
@@ -146,19 +145,21 @@ banBtn.addEventListener('click', async () => {
   }
 });
 
-// UNBAN
 unbanBtn.addEventListener('click', async () => {
+  if (!isLoggedIn()) return;
   const userId = unbanUserId.value.trim();
   if (!userId) return;
-
   banStatus.textContent = 'Unbanning...';
   try {
     const res = await fetch(`${API_BASE}/unban`, {
       method: 'POST',
-      headers: {'Content-Type':'application/json'},
+      headers: {
+        'Content-Type':'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+      },
       body: JSON.stringify({ userId })
     });
-    if (!res.ok) throw new Error('Failed');
+    if (!res.ok) throw new Error();
     banStatus.textContent = 'User unbanned!';
     loadBans();
   } catch {
