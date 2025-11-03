@@ -1,146 +1,149 @@
-const API_BASE = "https://roblox-api-lua8.onrender.com";
+const API_BASE = 'https://roblox-api-lua8.onrender.com';
 
-const loginScreen = document.getElementById('login-screen');
-const dashboard = document.getElementById('dashboard');
-const passwordInput = document.getElementById('password-input');
-const loginBtn = document.getElementById('login-btn');
-const loginError = document.getElementById('login-error');
-const logoutBtn = document.getElementById('logout-btn');
+document.addEventListener('DOMContentLoaded', () => {
+  const loginScreen = document.getElementById('login-screen');
+  const dashboard = document.getElementById('dashboard');
+  const passwordInput = document.getElementById('password-input');
+  const loginBtn = document.getElementById('login-btn');
+  const loginError = document.getElementById('login-error');
+  const logoutBtn = document.getElementById('logout-btn');
+  const banTableBody = document.querySelector('#banTable tbody');
+  const searchBar = document.getElementById('search-bar');
+  const searchBtn = document.getElementById('search-btn');
+  const searchResult = document.getElementById('searchResult');
+  const banUserId = document.getElementById('banUserId');
+  const banReason = document.getElementById('banReason');
+  const banBtn = document.getElementById('banBtn');
+  const unbanUserId = document.getElementById('unbanUserId');
+  const unbanBtn = document.getElementById('unbanBtn');
+  const banStatus = document.getElementById('banStatus');
 
-const tabButtons = document.querySelectorAll('.tab-btn');
-const tabPanels = document.querySelectorAll('.tab-panel');
+  let authToken = localStorage.getItem('authToken') || null;
 
-const banTable = document.getElementById('banTable').querySelector('tbody');
-const searchInput = document.getElementById('searchInput');
-const searchBtn = document.getElementById('searchBtn');
-const searchResult = document.getElementById('searchResult');
-
-const banUserId = document.getElementById('banUserId');
-const banReason = document.getElementById('banReason');
-const banBtn = document.getElementById('banBtn');
-const unbanUserId = document.getElementById('unbanUserId');
-const unbanBtn = document.getElementById('unbanBtn');
-const banStatus = document.getElementById('banStatus');
-
-let authToken = localStorage.getItem('authToken') || null;
-
-function showDashboard() {
-  loginScreen.classList.add('hidden');
-  dashboard.classList.remove('hidden');
-  loadBans();
-}
-
-async function login() {
-  const password = passwordInput.value;
-  try {
-    const res = await fetch(`${API_BASE}/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ password })
-    });
-    if (!res.ok) throw new Error('Invalid password');
-    const data = await res.json();
-    authToken = data.token;
-    localStorage.setItem('authToken', authToken);
-    showDashboard();
-  } catch(e) {
-    loginError.textContent = "Access Denied";
-  }
-}
-
-function logout() {
-  authToken = null;
-  localStorage.removeItem('authToken');
-  dashboard.classList.add('hidden');
-  loginScreen.classList.remove('hidden');
-}
-
-loginBtn.addEventListener('click', login);
-logoutBtn.addEventListener('click', logout);
-
-tabButtons.forEach(btn => {
-  btn.addEventListener('click', () => {
-    tabButtons.forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    const target = btn.getAttribute('data-tab');
-    tabPanels.forEach(panel => panel.classList.remove('active'));
-    document.getElementById(target).classList.add('active');
-  });
-});
-
-async function loadBans() {
-  if(!authToken) return;
-  try {
-    const res = await fetch(`${API_BASE}/bans`, {
-      headers: { 'Authorization': `Bearer ${authToken}` }
-    });
-    if(!res.ok) throw new Error('Failed to load');
-    const bans = await res.json();
-    renderBans(bans);
-  } catch(e) {
-    banTable.innerHTML = '<tr><td colspan="3">Failed to load bans</td></tr>';
-  }
-}
-
-function renderBans(bans) {
-  if(!Array.isArray(bans) || bans.length === 0){
-    banTable.innerHTML = '<tr><td colspan="3">No bans found</td></tr>';
-    return;
-  }
-  banTable.innerHTML = '';
-  bans.forEach(ban => {
-    const tr = document.createElement('tr');
-    tr.innerHTML = `<td>${ban.userId}</td><td>${ban.reason}</td><td>${ban.date}</td>`;
-    banTable.appendChild(tr);
-  });
-}
-
-searchBtn.addEventListener('click', async () => {
-  const id = searchInput.value.trim();
-  if(!id) return;
-  try {
-    const res = await fetch(`${API_BASE}/bans/${id}`, { headers: { 'Authorization': `Bearer ${authToken}` }});
-    if(!res.ok) throw new Error('Not found');
-    const data = await res.json();
-    searchResult.textContent = JSON.stringify(data, null, 2);
-  } catch(e) {
-    searchResult.textContent = "Player not found";
-  }
-});
-
-banBtn.addEventListener('click', async () => {
-  const id = banUserId.value.trim();
-  const reason = banReason.value.trim();
-  if(!id) return;
-  try {
-    const res = await fetch(`${API_BASE}/ban`, {
-      method:'POST',
-      headers:{ 'Content-Type':'application/json', 'Authorization': `Bearer ${authToken}` },
-      body: JSON.stringify({ userId:id, reason })
-    });
-    if(!res.ok) throw new Error();
-    banStatus.textContent = `Banned ${id}`;
+  function showDashboard() {
+    loginScreen.classList.add('hidden');
+    dashboard.classList.remove('hidden');
     loadBans();
-  } catch(e) {
-    banStatus.textContent = `Failed to ban ${id}`;
   }
-});
 
-unbanBtn.addEventListener('click', async () => {
-  const id = unbanUserId.value.trim();
-  if(!id) return;
-  try {
-    const res = await fetch(`${API_BASE}/unban`, {
-      method:'POST',
-      headers:{ 'Content-Type':'application/json', 'Authorization': `Bearer ${authToken}` },
-      body: JSON.stringify({ userId:id })
-    });
-    if(!res.ok) throw new Error();
-    banStatus.textContent = `Unbanned ${id}`;
-    loadBans();
-  } catch(e) {
-    banStatus.textContent = `Failed to unban ${id}`;
+  async function login() {
+    const password = passwordInput.value;
+    loginError.textContent = '';
+    try {
+      const res = await fetch(`${API_BASE}/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password })
+      });
+      if (!res.ok) throw new Error('Invalid password');
+      const data = await res.json();
+      authToken = data.token;
+      localStorage.setItem('authToken', authToken);
+      showDashboard();
+    } catch(e) {
+      loginError.textContent = 'Access Denied';
+    }
   }
-});
 
-if(authToken) showDashboard();
+  function logout() {
+    authToken = null;
+    localStorage.removeItem('authToken');
+    dashboard.classList.add('hidden');
+    loginScreen.classList.remove('hidden');
+  }
+
+  async function loadBans() {
+    banTableBody.innerHTML = '<tr><td colspan="3">Loading...</td></tr>';
+    try {
+      const res = await fetch(`${API_BASE}/bans`, {
+        headers: { 'Authorization': authToken || '' }
+      });
+      if (!res.ok) throw new Error('Failed to fetch bans');
+      const bans = await res.json();
+      if (!Array.isArray(bans) || bans.length === 0) {
+        banTableBody.innerHTML = '<tr><td colspan="3">No bans</td></tr>';
+        return;
+      }
+      banTableBody.innerHTML = '';
+      bans.forEach(ban => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${ban.userId}</td><td>${ban.reason}</td><td>${new Date(ban.date).toLocaleString()}</td>`;
+        banTableBody.appendChild(tr);
+      });
+    } catch(e) {
+      banTableBody.innerHTML = '<tr><td colspan="3">Error loading bans</td></tr>';
+      console.error(e);
+    }
+  }
+
+  async function searchPlayer() {
+    const userId = searchBar.value.trim();
+    searchResult.textContent = 'Searching...';
+    if (!userId) return;
+    try {
+      const res = await fetch(`${API_BASE}/bans/${userId}`, {
+        headers: { 'Authorization': authToken || '' }
+      });
+      if (res.status === 404) {
+        searchResult.textContent = 'Player not banned';
+        return;
+      }
+      const data = await res.json();
+      searchResult.textContent = `User ID: ${data.userId}, Reason: ${data.reason}, Date: ${new Date(data.date).toLocaleString()}`;
+    } catch(e) {
+      searchResult.textContent = 'Error fetching player';
+      console.error(e);
+    }
+  }
+
+  async function banPlayer() {
+    const userId = banUserId.value.trim();
+    const reason = banReason.value.trim() || 'No reason';
+    if (!userId) return;
+    try {
+      const res = await fetch(`${API_BASE}/ban`, {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': authToken || ''
+        },
+        body: JSON.stringify({ userId, reason })
+      });
+      if (!res.ok) throw new Error('Failed to ban');
+      banStatus.textContent = `Banned ${userId}`;
+      loadBans();
+    } catch(e) {
+      banStatus.textContent = 'Error banning user';
+      console.error(e);
+    }
+  }
+
+  async function unbanPlayer() {
+    const userId = unbanUserId.value.trim();
+    if (!userId) return;
+    try {
+      const res = await fetch(`${API_BASE}/unban`, {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': authToken || ''
+        },
+        body: JSON.stringify({ userId })
+      });
+      if (!res.ok) throw new Error('Failed to unban');
+      banStatus.textContent = `Unbanned ${userId}`;
+      loadBans();
+    } catch(e) {
+      banStatus.textContent = 'Error unbanning user';
+      console.error(e);
+    }
+  }
+
+  loginBtn.addEventListener('click', login);
+  logoutBtn.addEventListener('click', logout);
+  searchBtn.addEventListener('click', searchPlayer);
+  banBtn.addEventListener('click', banPlayer);
+  unbanBtn.addEventListener('click', unbanPlayer);
+
+  if(authToken) showDashboard();
+});
