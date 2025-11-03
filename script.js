@@ -107,15 +107,18 @@ async function loadBans() {
   if (!isLoggedIn()) return;
   banTableBody.innerHTML = '<tr><td colspan="5">Loading...</td></tr>';
   try {
+    console.log('Fetching bans...');  // Add a log to confirm fetch is starting
     const res = await fetch(`${API_BASE}/bans`, {
       headers: { 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` }
     });
+    console.log('Response:', res);  // Log the raw response from the server
+    
     if (!res.ok) {
       throw new Error('Failed to fetch bans');
     }
 
     const data = await res.json();
-    console.log('Bans Data:', data);  // Log the data to check it
+    console.log('Bans Data:', data);  // Log the parsed data to check it
 
     const bans = Object.values(data);
     if (!bans.length) {
@@ -123,7 +126,7 @@ async function loadBans() {
       return;
     }
 
-    // This part renders the bans in the table
+    // Render bans in the table
     banTableBody.innerHTML = bans.map(b => 
       `<tr>
         <td>${b.username || ''}</td>
@@ -137,6 +140,7 @@ async function loadBans() {
     banTableBody.innerHTML = '<tr><td colspan="5">Failed to load bans</td></tr>';
   }
 }
+
 
 
 
