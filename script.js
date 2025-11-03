@@ -80,7 +80,7 @@ tabs.forEach(btn => {
   });
 });
 function decodeExpiry(expiryStr) {
-  if (!expiryStr) return 'Never';
+  if (!expiryStr || expiryStr === 'null') return 'Never';  // Handle null or empty expiry
   const match = expiryStr.match(/\[(\d+),(\d+),(\d+),(\d+)\]/);
   if (!match) return 'Never';
 
@@ -95,7 +95,7 @@ function decodeExpiry(expiryStr) {
   totalSeconds += days * 24 * 60 * 60;
   totalSeconds += hours * 60 * 60;
 
-  // clamp to 10 years (same as Lua)
+  // Clamp to 10 years (same as Lua)
   const maxSeconds = 31536000 * 10;
   totalSeconds = Math.min(totalSeconds, maxSeconds);
 
@@ -103,23 +103,17 @@ function decodeExpiry(expiryStr) {
   const expiryDate = new Date(Date.now() + totalSeconds * 1000);
   return expiryDate.toLocaleString(); // Format it as a readable date
 }
+
 async function loadBans() {
   if (!isLoggedIn()) return;
   banTableBody.innerHTML = '<tr><td colspan="5">Loading...</td></tr>';
   try {
-    console.log('Fetching bans...');  // Add a log to confirm fetch is starting
     const res = await fetch(`${API_BASE}/bans`, {
       headers: { 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` }
     });
-    console.log('Response:', res);  // Log the raw response from the server
+    if (!res.ok) throw new Error('Failed to fetch bans');
     
-    if (!res.ok) {
-      throw new Error('Failed to fetch bans');
-    }
-
     const data = await res.json();
-    console.log('Bans Data:', data);  // Log the parsed data to check it
-
     const bans = Object.values(data);
     if (!bans.length) {
       banTableBody.innerHTML = '<tr><td colspan="5">No bans</td></tr>';
@@ -136,10 +130,11 @@ async function loadBans() {
         <td>${new Date(b.date).toLocaleString()}</td>
       </tr>`).join('');
   } catch (error) {
-    console.error('Error loading bans:', error);  // Log the error if it fails
+    console.error('Error loading bans:', error);
     banTableBody.innerHTML = '<tr><td colspan="5">Failed to load bans</td></tr>';
   }
 }
+
 
 
 
