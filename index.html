@@ -5,11 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>M.E.C.E Admin Dashboard</title>
   <link rel="stylesheet" href="style.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 </head>
 <body>
-  <div class="overlay"></div>
-
   <div id="login-screen" class="card">
     <h1>M.E.C.E ADMIN PANEL</h1>
     <input type="password" id="password-input" placeholder="Enter access key" />
@@ -23,7 +20,7 @@
       <button id="logout-btn">Logout</button>
     </header>
 
-    <nav class="tabs">
+    <nav>
       <button class="tab-btn active" data-tab="bans-tab">Banned Players</button>
       <button class="tab-btn" data-tab="search-tab">Search Player</button>
       <button class="tab-btn" data-tab="ban-tab">Ban/Unban Player</button>
@@ -55,16 +52,12 @@
 
       <section id="ban-tab" class="tab-panel">
         <h2>Ban / Unban Player</h2>
-        <div class="form-group">
-          <input type="text" id="banUserId" placeholder="User ID" />
-          <input type="text" id="banReason" placeholder="Reason (optional)" />
-          <button id="banBtn" class="danger">Ban</button>
-        </div>
-        <div class="form-group">
-          <input type="text" id="unbanUserId" placeholder="User ID" />
-          <button id="unbanBtn" class="success">Unban</button>
-        </div>
-        <div id="banStatus"></div>
+        <input type="text" id="banUserId" placeholder="User ID" />
+        <input type="text" id="banReason" placeholder="Reason (optional)" />
+        <button id="banBtn">Ban</button>
+        <input type="text" id="unbanUserId" placeholder="User ID" />
+        <button id="unbanBtn">Unban</button>
+        <p id="banStatus"></p>
       </section>
     </main>
   </div>

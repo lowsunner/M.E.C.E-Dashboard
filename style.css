@@ -1,36 +1,42 @@
 body {
-  margin: 0;
   font-family: 'Poppins', sans-serif;
   background: #121212;
   color: #e0e0e0;
-  overflow-x: hidden;
-}
-
-.overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.7);
-  z-index: 0;
+  margin: 0;
+  padding: 0;
 }
 
 .card {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: #1f1f1f;
-  padding: 2rem;
-  border-radius: 12px;
-  box-shadow: 0 0 20px rgba(0,0,0,0.5);
   width: 300px;
+  margin: 100px auto;
+  padding: 20px;
+  background: #1f1f1f;
+  border-radius: 8px;
   text-align: center;
-  opacity: 0;
-  z-index: 1;
-  animation: fadeIn 0.8s forwards;
 }
 
-@keyframes fadeIn {
-  to { opacity: 1; }
+input {
+  width: 90%;
+  margin: 10px 0;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #333;
+  background: #1f1f1f;
+  color: #e0e0e0;
+}
+
+button {
+  padding: 10px 20px;
+  margin: 5px 0;
+  border-radius: 6px;
+  border: none;
+  background: #1a73e8;
+  color: white;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #155cb0;
 }
 
 .hidden { display: none; }
@@ -38,54 +44,37 @@ body {
 header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  padding: 1rem 2rem;
+  padding: 10px 20px;
   background: #1f1f1f;
   border-bottom: 1px solid #333;
 }
 
-header h1 { margin: 0; font-size: 1.5rem; }
-
-button {
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
-  border: none;
-  cursor: pointer;
-  background: #1a73e8;
-  color: #fff;
-}
-
-button:hover { background: #155cb0; }
-
-nav.tabs {
+nav {
   display: flex;
-  padding: 1rem 2rem;
-  background: #1f1f1f;
-  border-bottom: 1px solid #333;
+  justify-content: center;
+  margin: 10px 0;
 }
 
-.tab-btn {
-  margin-right: 1rem;
-  padding: 0.5rem 1rem;
-  background: none;
-  border: 1px solid #444;
-  color: #e0e0e0;
-  border-radius: 6px;
-  cursor: pointer;
+nav button {
+  margin: 0 5px;
 }
-
-.tab-btn.active { background: #1a73e8; border-color: #1a73e8; }
-
-main { padding: 2rem; }
 
 .tab-panel { display: none; }
 .tab-panel.active { display: block; }
 
-table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
-th, td { padding: 0.75rem; text-align: left; border-bottom: 1px solid #333; }
-th { background: #1a73e8; color: #fff; }
-tr:hover { background: #1f1f1f; }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
 
-input { padding: 0.5rem; border-radius: 6px; border: 1px solid #333; background: #1f1f1f; color: #e0e0e0; margin-right: 0.5rem; }
+th, td {
+  border-bottom: 1px solid #333;
+  padding: 8px;
+  text-align: left;
+}
 
-#login-error, #banStatus, #searchResult { margin-top: 1rem; color: #f44336; }
+th {
+  background: #1a73e8;
+  color: white;
+}
