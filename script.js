@@ -54,12 +54,12 @@ function showDashboard() {
 logoutBtn.addEventListener('click', () => {
   localStorage.removeItem('adminPassword');
   dashboard.classList.add('hidden');
-  loginScreen.classList.remove('hidden');
+  loginScreen.classList.add('show');
 });
 
 // AUTO LOGIN
 window.addEventListener('DOMContentLoaded', () => {
-  loginScreen.classList.remove('hidden');
+  loginScreen.classList.remove('show');
   if (localStorage.getItem('adminPassword')) showDashboard();
 });
 

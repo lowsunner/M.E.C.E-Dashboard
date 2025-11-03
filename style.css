@@ -20,7 +20,18 @@ body {
   opacity: 1;
 }
 
-.hidden { display: none; }
+.hidden {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+#login-screen.show {
+  opacity: 1;
+  transform: translate(-50%, -50%) translateY(0);
+  pointer-events: all;
+}
+
 
 /* Login Screen */
 #login-screen {
