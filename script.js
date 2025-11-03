@@ -79,8 +79,9 @@ tabs.forEach(btn => {
     document.getElementById(btn.dataset.tab).classList.add('active');
   });
 });
+// Decode expiry string like "[0,0,7,0]" -> human readable expiry date
 function decodeExpiry(expiryStr) {
-  if (!expiryStr || expiryStr === 'null') return 'Never';  // Handle null or empty expiry
+  if (!expiryStr) return 'Never';
   const match = expiryStr.match(/\[(\d+),(\d+),(\d+),(\d+)\]/);
   if (!match) return 'Never';
 
@@ -95,14 +96,14 @@ function decodeExpiry(expiryStr) {
   totalSeconds += days * 24 * 60 * 60;
   totalSeconds += hours * 60 * 60;
 
-  // Clamp to 10 years (same as Lua)
+  // clamp to 10 years (same as Lua)
   const maxSeconds = 31536000 * 10;
   totalSeconds = Math.min(totalSeconds, maxSeconds);
 
-  // Convert seconds to milliseconds for JS
   const expiryDate = new Date(Date.now() + totalSeconds * 1000);
-  return expiryDate.toLocaleString(); // Format it as a readable date
+  return expiryDate.toLocaleString();
 }
+
 
 async function loadBans() {
   if (!isLoggedIn()) return;
@@ -111,16 +112,13 @@ async function loadBans() {
     const res = await fetch(`${API_BASE}/bans`, {
       headers: { 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` }
     });
-    if (!res.ok) throw new Error('Failed to fetch bans');
-    
+    if (!res.ok) throw new Error();
     const data = await res.json();
     const bans = Object.values(data);
     if (!bans.length) {
       banTableBody.innerHTML = '<tr><td colspan="5">No bans</td></tr>';
       return;
     }
-
-    // Render bans in the table
     banTableBody.innerHTML = bans.map(b => 
       `<tr>
         <td>${b.username || ''}</td>
@@ -129,11 +127,11 @@ async function loadBans() {
         <td>${decodeExpiry(b.expiry)}</td>  <!-- Display the decoded expiry here -->
         <td>${new Date(b.date).toLocaleString()}</td>
       </tr>`).join('');
-  } catch (error) {
-    console.error('Error loading bans:', error);
+  } catch {
     banTableBody.innerHTML = '<tr><td colspan="5">Failed to load bans</td></tr>';
   }
 }
+
 
 
 
