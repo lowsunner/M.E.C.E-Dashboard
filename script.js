@@ -79,7 +79,29 @@ tabs.forEach(btn => {
     document.getElementById(btn.dataset.tab).classList.add('active');
   });
 });
+function decodeExpiry(expiryStr) {
+  if (!expiryStr) return 'Never';
+  const match = expiryStr.match(/\[(\d+),(\d+),(\d+),(\d+)\]/);
+  if (!match) return 'Never';
 
+  const years = parseInt(match[1], 10) || 0;
+  const months = parseInt(match[2], 10) || 0;
+  const days = parseInt(match[3], 10) || 0;
+  const hours = parseInt(match[4], 10) || 0;
+
+  let totalSeconds = 0;
+  totalSeconds += years * 365 * 24 * 60 * 60;
+  totalSeconds += months * 30 * 24 * 60 * 60;
+  totalSeconds += days * 24 * 60 * 60;
+  totalSeconds += hours * 60 * 60;
+
+  // clamp to 10 years (same as Lua)
+  const maxSeconds = 31536000 * 10;
+  totalSeconds = Math.min(totalSeconds, maxSeconds);
+
+  const expiryDate = new Date(Date.now() + totalSeconds * 1000);
+  return expiryDate.toLocaleString();
+}
 async function loadBans() {
   if (!isLoggedIn()) return;
   banTableBody.innerHTML = '<tr><td colspan="5">Loading...</td></tr>';
@@ -99,13 +121,14 @@ async function loadBans() {
         <td>${b.username || ''}</td>
         <td>${b.userId}</td>
         <td>${b.reason || ''}</td>
-        <td>${decodeExpiry(b.expiry)}</td>
+        <td>${decodeExpiry(b.expiry)}</td>  <!-- Display the decoded expiry here -->
         <td>${new Date(b.date).toLocaleString()}</td>
       </tr>`).join('');
   } catch {
     banTableBody.innerHTML = '<tr><td colspan="5">Failed to load bans</td></tr>';
   }
 }
+
 
 
 searchBtn.addEventListener('click', async () => {
@@ -138,7 +161,7 @@ banBtn.addEventListener('click', async () => {
 
   banStatus.textContent = 'Banning...';
   try {
-    const res = await fetch(`${API_BASE}/ban`, {
+    const res = await fetch(`${API_BASE}/bans`, {
       method: 'POST',
       headers: {
         'Content-Type':'application/json',
