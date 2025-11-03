@@ -23,6 +23,18 @@ const unbanUserId = document.getElementById('unbanUserId');
 const unbanBtn = document.getElementById('unbanBtn');
 const banStatus = document.getElementById('banStatus');
 
+// Helper functions
+function showLogin() {
+  loginScreen.classList.add('show');
+  dashboard.classList.remove('show');
+}
+
+function showDashboard() {
+  loginScreen.classList.remove('show');
+  dashboard.classList.add('show');
+  loadBans();
+}
+
 // LOGIN
 async function login() {
   const password = passwordInput.value.trim();
@@ -44,23 +56,21 @@ async function login() {
   }
 }
 
-function showDashboard() {
-  loginScreen.classList.add('hidden');
-  dashboard.classList.remove('hidden');
-  loadBans();
-}
+loginBtn.addEventListener('click', login);
 
 // LOGOUT
 logoutBtn.addEventListener('click', () => {
   localStorage.removeItem('adminPassword');
-  dashboard.classList.add('hidden');
-  loginScreen.classList.add('show');
+  showLogin();
 });
 
 // AUTO LOGIN
 window.addEventListener('DOMContentLoaded', () => {
-  loginScreen.classList.remove('show');
-  if (localStorage.getItem('adminPassword')) showDashboard();
+  if (localStorage.getItem('adminPassword')) {
+    showDashboard();
+  } else {
+    showLogin();
+  }
 });
 
 // TAB SWITCHING
@@ -94,7 +104,7 @@ async function loadBans() {
         <td>${b.reason || ''}</td>
         <td>${new Date(b.date).toLocaleString()}</td>
       </tr>`).join('');
-  } catch (err) {
+  } catch {
     banTableBody.innerHTML = '<tr><td colspan="3">Failed to load bans</td></tr>';
   }
 }

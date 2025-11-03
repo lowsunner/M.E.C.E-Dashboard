@@ -1,4 +1,4 @@
-/* Base */
+/* --- Base --- */
 body {
   margin: 0;
   font-family: 'Poppins', sans-serif;
@@ -12,28 +12,17 @@ body {
   top:0; left:0; right:0; bottom:0;
   background: rgba(0,0,0,0.7);
   opacity: 0;
+  pointer-events: none;
   transition: opacity 0.5s ease;
   z-index: 1;
 }
 
 .overlay.show {
   opacity: 1;
-}
-
-.hidden {
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.5s ease, transform 0.5s ease;
-}
-
-#login-screen.show {
-  opacity: 1;
-  transform: translate(-50%, -50%) translateY(0);
   pointer-events: all;
 }
 
-
-/* Login Screen */
+/* --- Login Screen --- */
 #login-screen {
   position: fixed;
   top: 50%; left: 50%;
@@ -44,13 +33,15 @@ body {
   width: 320px;
   text-align: center;
   opacity: 0;
-  transition: opacity 0.5s ease, transform 0.5s ease;
+  pointer-events: none;
   z-index: 2;
   box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+  transition: opacity 0.5s ease, transform 0.5s ease;
 }
 
 #login-screen.show {
   opacity: 1;
+  pointer-events: all;
   transform: translate(-50%, -50%) translateY(0);
 }
 
@@ -87,12 +78,13 @@ body {
   color: #fff;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.3s, transform 0.2s;
+  transition: background 0.3s, transform 0.2s, box-shadow 0.2s;
 }
 
 #login-screen button:hover {
   background: #155cb0;
   transform: translateY(-2px);
+  box-shadow: 0 0 10px rgba(26,115,232,0.6);
 }
 
 #login-error {
@@ -101,7 +93,18 @@ body {
   font-weight: 500;
 }
 
-/* Dashboard */
+/* --- Dashboard --- */
+#dashboard {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s ease;
+}
+
+#dashboard.show {
+  opacity: 1;
+  pointer-events: all;
+}
+
 header {
   display: flex;
   justify-content: space-between;
@@ -115,21 +118,27 @@ header {
 header h1 {
   font-size: 1.5rem;
   color: #1a73e8;
+  letter-spacing: 0.5px;
 }
 
 header button {
   padding: 0.5rem 1rem;
   border-radius: 10px;
   background: #ff4d4f;
-  transition: background 0.3s, transform 0.2s;
+  color: #fff;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.2s, box-shadow 0.2s;
 }
 
 header button:hover {
   background: #d9363e;
   transform: translateY(-1px);
+  box-shadow: 0 0 8px rgba(255,77,79,0.6);
 }
 
-/* Tabs */
+/* --- Tabs --- */
 .tabs {
   display: flex;
   justify-content: flex-start;
@@ -153,16 +162,18 @@ header button:hover {
 .tab-btn:hover {
   background: #1a73e8;
   color: #fff;
-  transform: translateY(-2px);
+  transform: translateY(-1px);
+  box-shadow: 0 0 8px rgba(26,115,232,0.5);
 }
 
 .tab-btn.active {
   background: #1a73e8;
   color: #fff;
   border-color: #1a73e8;
+  box-shadow: 0 0 12px rgba(26,115,232,0.6);
 }
 
-/* Main Content */
+/* --- Main Content --- */
 main {
   padding: 2rem;
 }
@@ -178,7 +189,7 @@ main {
   opacity: 1;
 }
 
-/* Table */
+/* --- Table --- */
 table {
   width: 100%;
   border-collapse: collapse;
@@ -202,9 +213,10 @@ th {
 
 tr:hover {
   background: #1f1f1f;
+  transition: background 0.3s;
 }
 
-/* Inputs & Buttons */
+/* --- Inputs & Buttons --- */
 input {
   padding: 0.6rem 0.75rem;
   border-radius: 10px;
@@ -229,26 +241,28 @@ button {
   background: #1a73e8;
   color: #fff;
   font-weight: 500;
-  transition: background 0.3s, transform 0.2s;
+  transition: background 0.3s, transform 0.2s, box-shadow 0.2s;
 }
 
 button:hover {
   background: #155cb0;
   transform: translateY(-1px);
+  box-shadow: 0 0 8px rgba(26,115,232,0.5);
 }
 
-/* Forms */
+/* --- Forms --- */
 .form-group {
   margin-bottom: 1rem;
 }
 
-/* Status & Search */
+/* --- Status & Search --- */
 #banStatus, #searchResult {
   margin-top: 1rem;
   font-weight: 500;
+  color: #e0e0e0;
 }
 
-/* Scrollbar */
+/* --- Scrollbar --- */
 ::-webkit-scrollbar {
   width: 8px;
 }
