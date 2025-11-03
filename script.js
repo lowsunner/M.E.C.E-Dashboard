@@ -110,13 +110,20 @@ async function loadBans() {
     const res = await fetch(`${API_BASE}/bans`, {
       headers: { 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` }
     });
-    if (!res.ok) throw new Error();
+    if (!res.ok) {
+      throw new Error('Failed to fetch bans');
+    }
+
     const data = await res.json();
+    console.log('Bans Data:', data);  // Log the data to check it
+
     const bans = Object.values(data);
     if (!bans.length) {
       banTableBody.innerHTML = '<tr><td colspan="5">No bans</td></tr>';
       return;
     }
+
+    // This part renders the bans in the table
     banTableBody.innerHTML = bans.map(b => 
       `<tr>
         <td>${b.username || ''}</td>
@@ -125,10 +132,12 @@ async function loadBans() {
         <td>${decodeExpiry(b.expiry)}</td>  <!-- Display the decoded expiry here -->
         <td>${new Date(b.date).toLocaleString()}</td>
       </tr>`).join('');
-  } catch {
+  } catch (error) {
+    console.error('Error loading bans:', error);  // Log the error if it fails
     banTableBody.innerHTML = '<tr><td colspan="5">Failed to load bans</td></tr>';
   }
 }
+
 
 
 
