@@ -67,23 +67,31 @@ logoutBtn.addEventListener('click', () => {
 });
 
 async function loadBans() {
+  const banTableBody = document.querySelector('#banTable tbody');
   banTableBody.innerHTML = '<tr><td colspan="3">Loading...</td></tr>';
+
   try {
     const res = await fetch(`${API_BASE}/bans`);
-    const bans = await res.json();
-    if (!Array.isArray(bans) || bans.length === 0) {
+    const data = await res.json();
+
+    // Firebase returns an object keyed by userId
+    const bansArray = Object.values(data); // <-- convert to array
+
+    if (!bansArray.length) {
       banTableBody.innerHTML = '<tr><td colspan="3">No bans</td></tr>';
       return;
     }
-    banTableBody.innerHTML = bans.map(b => `
-      <tr>
-        <td>${b.userId}</td>
-        <td>${b.reason}</td>
-        <td>${b.date}</td>
-      </tr>
-    `).join('');
-  } catch {
-    banTableBody.innerHTML = '<tr><td colspan="3">Failed to load bans</td></tr>';
+
+    banTableBody.innerHTML = bansArray
+      .map(ban => `<tr>
+        <td>${ban.userId}</td>
+        <td>${ban.reason}</td>
+        <td>${ban.date}</td>
+      </tr>`)
+      .join('');
+  } catch (err) {
+    banTableBody.innerHTML = '<tr><td colspan="3">Error loading bans</td></tr>';
+    console.error(err);
   }
 }
 
