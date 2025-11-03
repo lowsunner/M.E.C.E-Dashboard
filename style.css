@@ -1,42 +1,9 @@
 body {
-  font-family: 'Poppins', sans-serif;
+  font-family: sans-serif;
   background: #121212;
   color: #e0e0e0;
   margin: 0;
   padding: 0;
-}
-
-.card {
-  width: 300px;
-  margin: 100px auto;
-  padding: 20px;
-  background: #1f1f1f;
-  border-radius: 8px;
-  text-align: center;
-}
-
-input {
-  width: 90%;
-  margin: 10px 0;
-  padding: 10px;
-  border-radius: 6px;
-  border: 1px solid #333;
-  background: #1f1f1f;
-  color: #e0e0e0;
-}
-
-button {
-  padding: 10px 20px;
-  margin: 5px 0;
-  border-radius: 6px;
-  border: none;
-  background: #1a73e8;
-  color: white;
-  cursor: pointer;
-}
-
-button:hover {
-  background: #155cb0;
 }
 
 .hidden { display: none; }
@@ -44,19 +11,28 @@ button:hover {
 header {
   display: flex;
   justify-content: space-between;
-  padding: 10px 20px;
+  padding: 1rem;
   background: #1f1f1f;
-  border-bottom: 1px solid #333;
 }
 
 nav {
   display: flex;
-  justify-content: center;
-  margin: 10px 0;
+  gap: 1rem;
+  padding: 1rem;
 }
 
 nav button {
-  margin: 0 5px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+}
+
+nav button.active {
+  background: #1a73e8;
+  color: #fff;
+}
+
+main {
+  padding: 1rem;
 }
 
 .tab-panel { display: none; }
@@ -65,16 +41,30 @@ nav button {
 table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 10px;
+  margin-top: 1rem;
 }
 
 th, td {
-  border-bottom: 1px solid #333;
-  padding: 8px;
-  text-align: left;
+  border: 1px solid #333;
+  padding: 0.5rem;
 }
 
-th {
+input {
+  margin: 0.25rem 0;
+  padding: 0.5rem;
+  background: #1f1f1f;
+  color: #e0e0e0;
+  border: 1px solid #333;
+}
+
+button {
+  padding: 0.5rem 1rem;
   background: #1a73e8;
-  color: white;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+}
+
+#banStatus, #searchResult {
+  margin-top: 1rem;
 }

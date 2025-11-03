@@ -1,16 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>M.E.C.E Admin Dashboard</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div id="login-screen" class="card">
+  <div id="login-screen">
     <h1>M.E.C.E ADMIN PANEL</h1>
-    <input type="password" id="password-input" placeholder="Enter access key" />
-    <button id="login-btn">Access</button>
+    <input type="password" id="password-input" placeholder="Enter password">
+    <button id="login-btn">Login</button>
     <p id="login-error"></p>
   </div>
 
@@ -45,19 +45,19 @@
 
       <section id="search-tab" class="tab-panel">
         <h2>Search Player</h2>
-        <input type="text" id="searchInput" placeholder="Enter User ID..." />
+        <input type="text" id="searchInput" placeholder="Enter User ID">
         <button id="searchBtn">Search</button>
         <div id="searchResult"></div>
       </section>
 
       <section id="ban-tab" class="tab-panel">
         <h2>Ban / Unban Player</h2>
-        <input type="text" id="banUserId" placeholder="User ID" />
-        <input type="text" id="banReason" placeholder="Reason (optional)" />
+        <input type="text" id="banUserId" placeholder="User ID">
+        <input type="text" id="banReason" placeholder="Reason">
         <button id="banBtn">Ban</button>
-        <input type="text" id="unbanUserId" placeholder="User ID" />
+        <input type="text" id="unbanUserId" placeholder="User ID">
         <button id="unbanBtn">Unban</button>
-        <p id="banStatus"></p>
+        <div id="banStatus"></div>
       </section>
     </main>
   </div>
