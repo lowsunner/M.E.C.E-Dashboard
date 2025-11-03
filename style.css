@@ -1,31 +1,12 @@
-/* --- Base --- */
-body {
-  margin: 0;
-  font-family: 'Poppins', sans-serif;
-  background: #0d0d0d;
-  color: #e0e0e0;
-  transition: background 0.3s, color 0.3s;
-}
-
-.overlay {
-  position: fixed;
-  top:0; left:0; right:0; bottom:0;
-  background: rgba(0,0,0,0.7);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.5s ease;
-  z-index: 1;
-}
-
-.overlay.show {
-  opacity: 1;
-  pointer-events: all;
-}
-
 /* --- Login Screen --- */
 #login-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   position: fixed;
-  top: 50%; left: 50%;
+  top: 50%;
+  left: 50%;
   transform: translate(-50%, -50%) translateY(-20px);
   padding: 2.5rem;
   background: linear-gradient(145deg, #1a1a1a, #111);
@@ -52,9 +33,15 @@ body {
   letter-spacing: 1px;
 }
 
-#login-screen input {
+#login-screen input,
+#login-screen button {
   width: 100%;
-  margin-bottom: 1rem;
+  max-width: 100%;
+  margin: 0.5rem 0;
+  text-align: center;
+}
+
+#login-screen input {
   padding: 0.75rem;
   border-radius: 10px;
   border: 1px solid #333;
@@ -64,13 +51,16 @@ body {
   transition: border 0.3s, box-shadow 0.3s;
 }
 
+#login-screen input::placeholder {
+  text-align: center;
+}
+
 #login-screen input:focus {
   border-color: #1a73e8;
   box-shadow: 0 0 8px rgba(26, 115, 232, 0.4);
 }
 
 #login-screen button {
-  width: 100%;
   padding: 0.75rem;
   border-radius: 10px;
   border: none;
@@ -91,191 +81,5 @@ body {
   margin-top: 0.8rem;
   color: #ff4d4f;
   font-weight: 500;
-}
-
-/* --- Dashboard --- */
-#dashboard {
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.5s ease;
-}
-
-#dashboard.show {
-  opacity: 1;
-  pointer-events: all;
-}
-
-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem 2rem;
-  background: #1a1a1a;
-  border-bottom: 1px solid #333;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-}
-
-header h1 {
-  font-size: 1.5rem;
-  color: #1a73e8;
-  letter-spacing: 0.5px;
-}
-
-header button {
-  padding: 0.5rem 1rem;
-  border-radius: 10px;
-  background: #ff4d4f;
-  color: #fff;
-  font-weight: 500;
-  border: none;
-  cursor: pointer;
-  transition: background 0.3s, transform 0.2s, box-shadow 0.2s;
-}
-
-header button:hover {
-  background: #d9363e;
-  transform: translateY(-1px);
-  box-shadow: 0 0 8px rgba(255,77,79,0.6);
-}
-
-/* --- Tabs --- */
-.tabs {
-  display: flex;
-  justify-content: flex-start;
-  background: #1a1a1a;
-  padding: 0.5rem 2rem;
-  border-bottom: 1px solid #333;
-}
-
-.tab-btn {
-  margin-right: 1rem;
-  padding: 0.6rem 1.2rem;
-  background: #121212;
-  border: 1px solid #333;
-  color: #e0e0e0;
-  cursor: pointer;
-  border-radius: 10px;
-  font-weight: 500;
-  transition: all 0.3s;
-}
-
-.tab-btn:hover {
-  background: #1a73e8;
-  color: #fff;
-  transform: translateY(-1px);
-  box-shadow: 0 0 8px rgba(26,115,232,0.5);
-}
-
-.tab-btn.active {
-  background: #1a73e8;
-  color: #fff;
-  border-color: #1a73e8;
-  box-shadow: 0 0 12px rgba(26,115,232,0.6);
-}
-
-/* --- Main Content --- */
-main {
-  padding: 2rem;
-}
-
-.tab-panel {
-  display: none;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.tab-panel.active {
-  display: block;
-  opacity: 1;
-}
-
-/* --- Table --- */
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 1rem;
-  background: #121212;
-  border-radius: 10px;
-  overflow: hidden;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-}
-
-th, td {
-  padding: 0.85rem;
-  text-align: left;
-  border-bottom: 1px solid #333;
-}
-
-th {
-  background: linear-gradient(90deg, #1a73e8, #155cb0);
-  color: #fff;
-}
-
-tr:hover {
-  background: #1f1f1f;
-  transition: background 0.3s;
-}
-
-/* --- Inputs & Buttons --- */
-input {
-  padding: 0.6rem 0.75rem;
-  border-radius: 10px;
-  border: 1px solid #333;
-  background: #121212;
-  color: #e0e0e0;
-  margin-right: 0.5rem;
-  outline: none;
-  transition: border 0.3s, box-shadow 0.3s;
-}
-
-input:focus {
-  border-color: #1a73e8;
-  box-shadow: 0 0 6px rgba(26, 115, 232, 0.4);
-}
-
-button {
-  padding: 0.6rem 1rem;
-  border-radius: 10px;
-  border: none;
-  cursor: pointer;
-  background: #1a73e8;
-  color: #fff;
-  font-weight: 500;
-  transition: background 0.3s, transform 0.2s, box-shadow 0.2s;
-}
-
-button:hover {
-  background: #155cb0;
-  transform: translateY(-1px);
-  box-shadow: 0 0 8px rgba(26,115,232,0.5);
-}
-
-/* --- Forms --- */
-.form-group {
-  margin-bottom: 1rem;
-}
-
-/* --- Status & Search --- */
-#banStatus, #searchResult {
-  margin-top: 1rem;
-  font-weight: 500;
-  color: #e0e0e0;
-}
-
-/* --- Scrollbar --- */
-::-webkit-scrollbar {
-  width: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: #121212;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #1a73e8;
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #155cb0;
+  text-align: center;
 }
