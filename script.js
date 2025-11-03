@@ -80,29 +80,15 @@ tabs.forEach(btn => {
   });
 });
 // Decode expiry string like "[0,0,7,0]" -> human readable expiry date
-function decodeExpiry(expiryStr) {
-  if (!expiryStr) return 'Never';
-  const match = expiryStr.match(/\[(\d+),(\d+),(\d+),(\d+)\]/);
-  if (!match) return 'Never';
+function decodeExpiry(expiry) {
+  // If no expiry or invalid expiry, return 'Never'
+  if (!expiry || typeof expiry !== 'number') return 'Never';
 
-  const years = parseInt(match[1], 10) || 0;
-  const months = parseInt(match[2], 10) || 0;
-  const days = parseInt(match[3], 10) || 0;
-  const hours = parseInt(match[4], 10) || 0;
-
-  let totalSeconds = 0;
-  totalSeconds += years * 365 * 24 * 60 * 60;
-  totalSeconds += months * 30 * 24 * 60 * 60;
-  totalSeconds += days * 24 * 60 * 60;
-  totalSeconds += hours * 60 * 60;
-
-  // clamp to 10 years (same as Lua)
-  const maxSeconds = 31536000 * 10;
-  totalSeconds = Math.min(totalSeconds, maxSeconds);
-
-  const expiryDate = new Date(Date.now() + totalSeconds * 1000);
-  return expiryDate.toLocaleString();
+  // Convert the expiry time (which is in seconds from Unix epoch) to a Date object
+  const expiryDate = new Date(expiry * 1000);  // Multiply by 1000 to convert seconds to milliseconds
+  return expiryDate.toLocaleString();  // Convert it to a readable date string
 }
+
 
 
 async function loadBans() {
