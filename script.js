@@ -99,8 +99,9 @@ function decodeExpiry(expiryStr) {
   const maxSeconds = 31536000 * 10;
   totalSeconds = Math.min(totalSeconds, maxSeconds);
 
+  // Convert seconds to milliseconds for JS
   const expiryDate = new Date(Date.now() + totalSeconds * 1000);
-  return expiryDate.toLocaleString();
+  return expiryDate.toLocaleString(); // Format it as a readable date
 }
 async function loadBans() {
   if (!isLoggedIn()) return;
