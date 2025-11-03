@@ -99,13 +99,14 @@ async function loadBans() {
         <td>${b.username || ''}</td>
         <td>${b.userId}</td>
         <td>${b.reason || ''}</td>
-        <td>${b.expiry ? new Date(b.expiry).toLocaleString() : 'Never'}</td>
+        <td>${decodeExpiry(b.expiry)}</td>
         <td>${new Date(b.date).toLocaleString()}</td>
       </tr>`).join('');
   } catch {
     banTableBody.innerHTML = '<tr><td colspan="5">Failed to load bans</td></tr>';
   }
 }
+
 
 searchBtn.addEventListener('click', async () => {
   if (!isLoggedIn()) return;
@@ -118,18 +119,23 @@ searchBtn.addEventListener('click', async () => {
     });
     if (!res.ok) throw new Error();
     const ban = await res.json();
-    searchResult.textContent = `User ${ban.username || ''} (${ban.userId}) banned for: "${ban.reason}" until ${ban.expiry ? new Date(ban.expiry).toLocaleString() : 'Never'} on ${new Date(ban.date).toLocaleString()}`;
+    searchResult.textContent = `User ${ban.username || ''} (${ban.userId}) banned for: "${ban.reason || ''}" — expires: ${decodeExpiry(ban.expiry)} — banned on ${new Date(ban.date).toLocaleString()}`;
   } catch {
     searchResult.textContent = 'User not banned';
   }
 });
 
 
+
 banBtn.addEventListener('click', async () => {
   if (!isLoggedIn()) return;
   const query = banUserId.value.trim(); // can be username or userId
   const reason = banReason.value.trim();
+  const expiry = document.getElementById('banExpiry').value.trim(); // input for expiry
   if (!query) return;
+
+  const parsedExpiry = expiry ? `[${expiry}]` : null; // if expiry is provided, format it
+
   banStatus.textContent = 'Banning...';
   try {
     const res = await fetch(`${API_BASE}/ban`, {
@@ -138,7 +144,7 @@ banBtn.addEventListener('click', async () => {
         'Content-Type':'application/json',
         'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
       },
-      body: JSON.stringify({ query, reason }) // send as `query` so API can detect userId or username
+      body: JSON.stringify({ query, reason, expiry: parsedExpiry }) // send expiry if present
     });
     if (!res.ok) throw new Error();
     banStatus.textContent = 'User banned!';
@@ -147,6 +153,7 @@ banBtn.addEventListener('click', async () => {
     banStatus.textContent = 'Ban failed';
   }
 });
+
 
 unbanBtn.addEventListener('click', async () => {
   if (!isLoggedIn()) return;
