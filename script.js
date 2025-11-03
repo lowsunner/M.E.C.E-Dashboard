@@ -145,30 +145,46 @@ searchBtn.addEventListener('click', async () => {
 
 banBtn.addEventListener('click', async () => {
   if (!isLoggedIn()) return;
-  const query = banUserId.value.trim(); // can be username or userId
+  
+  // Capture user ID and reason
+  const userId = banUserId.value.trim();
   const reason = banReason.value.trim();
-  const expiry = document.getElementById('banExpiry').value.trim(); // input for expiry
-  if (!query) return;
-
-  const parsedExpiry = expiry ? `[${expiry}]` : null; // if expiry is provided, format it
-
+  
+  // Capture the duration inputs (years, months, days, hours)
+  const years = parseInt(document.getElementById('banYears').value.trim()) || 0;
+  const months = parseInt(document.getElementById('banMonths').value.trim()) || 0;
+  const days = parseInt(document.getElementById('banDays').value.trim()) || 0;
+  const hours = parseInt(document.getElementById('banHours').value.trim()) || 0;
+  
+  if (!userId) return;
+  
+  // Create the duration object
+  const duration = { years, months, days, hours };
+  
+  // Display banning status
   banStatus.textContent = 'Banning...';
+  
   try {
-    const res = await fetch(`${API_BASE}/bans`, {
+    const res = await fetch(`${API_BASE}/ban`, {
       method: 'POST',
       headers: {
-        'Content-Type':'application/json',
+        'Content-Type': 'application/json',
         'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
       },
-      body: JSON.stringify({ query, reason, expiry: parsedExpiry }) // send expiry if present
+      body: JSON.stringify({ userId, reason, duration })  // Send the duration object
     });
+    
     if (!res.ok) throw new Error();
+    
+    // Update UI after success
     banStatus.textContent = 'User banned!';
-    loadBans();
+    loadBans();  // Reload bans list to reflect the new ban
   } catch {
+    // Update UI after failure
     banStatus.textContent = 'Ban failed';
   }
 });
+
 
 
 unbanBtn.addEventListener('click', async () => {
