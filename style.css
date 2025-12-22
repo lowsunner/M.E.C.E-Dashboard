@@ -311,3 +311,23 @@ button:hover {
 ::-webkit-scrollbar-thumb:hover {
   background: #155cb0;
 }
+
+.ban-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.perma-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  user-select: none;
+}
+
+.perma-toggle input {
+  width: auto;
+  margin: 0;
+  cursor: pointer;
+}

@@ -144,20 +144,41 @@ searchBtn.addEventListener('click', async () => {
 
 
 document.addEventListener('DOMContentLoaded', () => {
-  // Ban Button Listener
+
+  const permaCheckbox = document.getElementById('permaBan');
+
+  if (permaCheckbox) {
+    permaCheckbox.addEventListener('change', e => {
+      const disabled = e.target.checked;
+      ['banYears', 'banMonths', 'banDays', 'banHours'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.disabled = disabled;
+      });
+    });
+  }
+
   const banBtn = document.getElementById('banBtn');
   if (banBtn) {
     banBtn.addEventListener('click', async () => {
       const userId = document.getElementById('banUserId').value.trim();
       const reason = document.getElementById('banReason').value.trim();
-      const years = parseInt(document.getElementById('banYears').value.trim()) || 0;
-      const months = parseInt(document.getElementById('banMonths').value.trim()) || 0;
-      const days = parseInt(document.getElementById('banDays').value.trim()) || 0;
-      const hours = parseInt(document.getElementById('banHours').value.trim()) || 0;
+
+      const years = parseInt(document.getElementById('banYears').value) || 0;
+      const months = parseInt(document.getElementById('banMonths').value) || 0;
+      const days = parseInt(document.getElementById('banDays').value) || 0;
+      const hours = parseInt(document.getElementById('banHours').value) || 0;
+
+      const isPerma = document.getElementById('permaBan').checked;
+
+      let duration;
+      if (isPerma) {
+        duration = null;
+      } else {
+        duration = { years, months, days, hours };
+      }
 
       if (!userId) return;
 
-      const duration = { years, months, days, hours };
       document.getElementById('banStatus').textContent = 'Banning...';
 
       try {
@@ -167,19 +188,23 @@ document.addEventListener('DOMContentLoaded', () => {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
           },
-          body: JSON.stringify({ userId, reason, duration }) // Send duration
+          body: JSON.stringify({
+            userId,
+            reason,
+            duration,
+            permanent: isPerma
+          })
         });
 
-        if (!res.ok) throw new Error('Failed to ban user');
+        if (!res.ok) throw new Error();
         document.getElementById('banStatus').textContent = 'User banned!';
-        loadBans(); // Reload bans after success
-      } catch (error) {
+        loadBans();
+      } catch {
         document.getElementById('banStatus').textContent = 'Ban failed';
       }
     });
   }
 
-  // Unban Button Listener
   const unbanBtn = document.getElementById('unbanBtn');
   if (unbanBtn) {
     unbanBtn.addEventListener('click', async () => {
@@ -187,6 +212,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!userId) return;
 
       document.getElementById('banStatus').textContent = 'Unbanning...';
+
       try {
         const res = await fetch(`${API_BASE}/unban`, {
           method: 'POST',
@@ -197,14 +223,17 @@ document.addEventListener('DOMContentLoaded', () => {
           body: JSON.stringify({ userId })
         });
 
-        if (!res.ok) throw new Error('Failed to unban');
+        if (!res.ok) throw new Error();
         document.getElementById('banStatus').textContent = 'User unbanned!';
-        loadBans(); // Reload bans after unban
-      } catch (error) {
+        loadBans();
+      } catch {
         document.getElementById('banStatus').textContent = 'Unban failed';
       }
     });
   }
+
 });
+
+
 
 
