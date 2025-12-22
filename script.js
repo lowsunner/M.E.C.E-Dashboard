@@ -153,6 +153,7 @@ document.addEventListener('DOMContentLoaded', () => {
       ['banYears', 'banMonths', 'banDays', 'banHours'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.disabled = disabled;
+        if (disabled) el.value = ''; // clear input when perma checked
       });
     });
   }
@@ -162,22 +163,20 @@ document.addEventListener('DOMContentLoaded', () => {
     banBtn.addEventListener('click', async () => {
       const userId = document.getElementById('banUserId').value.trim();
       const reason = document.getElementById('banReason').value.trim();
-
-      const years = parseInt(document.getElementById('banYears').value) || 0;
-      const months = parseInt(document.getElementById('banMonths').value) || 0;
-      const days = parseInt(document.getElementById('banDays').value) || 0;
-      const hours = parseInt(document.getElementById('banHours').value) || 0;
+      if (!userId) return;
 
       const isPerma = document.getElementById('permaBan').checked;
 
       let duration;
       if (isPerma) {
-        duration = null;
+        duration = "Never";
       } else {
+        const years = parseInt(document.getElementById('banYears').value) || 0;
+        const months = parseInt(document.getElementById('banMonths').value) || 0;
+        const days = parseInt(document.getElementById('banDays').value) || 0;
+        const hours = parseInt(document.getElementById('banHours').value) || 0;
         duration = { years, months, days, hours };
       }
-
-      if (!userId) return;
 
       document.getElementById('banStatus').textContent = 'Banning...';
 
@@ -233,6 +232,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
 });
+
 
 
 
